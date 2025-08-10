@@ -192,6 +192,43 @@ html.dark header {
   background-color: var(--dark-header-bg);
 }
 
+/* Custom Theme Colors */
+html.dark .text-primary {
+  color: #60a5fa; /* A lighter blue for dark backgrounds */
+}
+
+html.dark .bg-blue-50 {
+  background-color: rgba(37, 99, 235, 0.1);
+}
+
+html.dark .bg-blue-100 {
+  background-color: rgba(37, 99, 235, 0.2);
+}
+
+html.dark .bg-green-100 {
+  background-color: rgba(16, 185, 129, 0.2);
+}
+
+html.dark .text-success {
+  color: #34d399; /* A lighter green */
+}
+
+html.dark .text-warning {
+  color: #fbbf24; /* A lighter yellow */
+}
+
+html.dark .text-danger {
+  color: #f87171; /* A lighter red */
+}
+
+html.dark .border-danger {
+  border-color: #ef4444;
+}
+
+html.dark .border-warning {
+  border-color: #f59e0b;
+}
+
 /* Additional elements that need dark mode styling */
 html.dark .bg-gradient-custom {
   background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 50%, #252525 100%);
