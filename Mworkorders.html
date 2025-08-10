@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Orders</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#1e40af',
+                        accent: '#3b82f6',
+                        danger: '#ef4444',
+                        warning: '#f59e0b',
+                        success: '#10b981',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e5e7eb;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="bg-primary text-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-clipboard-list text-2xl"></i>
+                <h1 class="text-2xl font-bold">Work Orders</h1>
+            </div>
+            <!--<div class="flex items-center space-x-4">
+                <div class="relative">
+                    <button class="p-2 rounded-full hover:bg-secondary">
+                        <i class="fas fa-bell"></i>
+                        <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-danger"></span>
+                    </button>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="h-8 w-8 rounded-full bg-accent flex items-center justify-center text-white font-semibold">JM</div>
+                    <span class="hidden md:inline">John Manager</span>
+                </div>-->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Dashboard Overview -->
+        <section class="mb-10">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Order Overview</h2>
+                <div class="flex space-x-2">
+                    <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition">
+                        <i class="fas fa-plus mr-2"></i> New Order
+                    </button>
+                    <button class="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-100 transition">
+                        <i class="fas fa-filter mr-2"></i> Filter
+                    </button>
+                </div>
+            </div>
+            
+            <div class="dashboard-grid mb-8">
+                <!-- Stats Cards -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-primary">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500">Total Ordered machines</p>
+                            <h3 class="text-3xl font-bold text-gray-800">12</h3>
+                        </div>
+                        <div class="p-3 rounded-full bg-primary bg-opacity-10 text-primary">
+                            <i class="fas fa-clipboard-list text-xl"></i>
+                        </div>
+                    </div>
+                    <p class="text-sm text-success mt-2"><i class="fas fa-arrow-up mr-1"></i> 12% from last month</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-accent">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500">Pending Approval</p>
+                            <h3 class="text-3xl font-bold text-gray-800">4</h3>
+                        </div>
+                        <div class="p-3 rounded-full bg-accent bg-opacity-10 text-accent">
+                            <i class="fas fa-clock text-xl"></i>
+                        </div>
+                    </div>
+                    <p class="text-sm text-warning mt-2"><i class="fas fa-exclamation-circle mr-1"></i> 2 overdue</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-success">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500">Received orders</p>
+                            <h3 class="text-3xl font-bold text-gray-800">6</h3>
+                        </div>
+                        <div class="p-3 rounded-full bg-success bg-opacity-10 text-success">
+                            <i class="fas fa-check-circle text-xl"></i>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-2">Last completed 2 hours ago</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-danger">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500">Machines Returned</p>
+                            <h3 class="text-3xl font-bold text-gray-800">2</h3>
+                        </div>
+                        <div class="p-3 rounded-full bg-danger bg-opacity-10 text-danger">
+                            <i class="fas fa-exclamation-triangle text-xl"></i>
+                        </div>
+                    </div>
+                    <p class="text-sm text-danger mt-2"><i class="fas fa-arrow-up mr-1"></i> 1 new today</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Orders Section -->
+        <section class="mb-10">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Recent Work Orders</h2>
+                <a href="#" class="text-primary hover:text-secondary font-medium">View All <i class="fas fa-arrow-right ml-1"></i></a>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Machine Type</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned To</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap font-medium text-primary">WO-1024</td>
+                                <td class="px-6 py-4 whitespace-nowrap">CNC Lathe</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-danger bg-opacity-10 text-danger">High</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-24 mr-2">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill bg-warning" style="width: 65%"></div>
+                                            </div>
+                                        </div>
+                                        <span>In Progress</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">Maintenance Team A</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-500">2023-06-15</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <button class="text-accent hover:text-secondary mr-3">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="text-primary hover:text-secondary">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap font-medium text-primary">WO-1023</td>
+                                <td class="px-6 py-4 whitespace-nowrap">Hydraulic Press</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-warning bg-opacity-10 text-warning">Medium</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-24 mr-2">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill bg-primary" style="width: 30%"></div>
+                                            </div>
+                                        </div>
+                                        <span>Assigned</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">Technician Team</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-500">2023-06-20</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <button class="text-accent hover:text-secondary mr-3">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="text-primary hover:text-secondary">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap font-medium text-primary">WO-1022</td>
+                                <td class="px-6 py-4 whitespace-nowrap">Packaging Machine</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-success bg-opacity-10 text-success">Low</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-24 mr-2">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill bg-success" style="width: 100%"></div>
+                                            </div>
+                                        </div>
+                                        <span>Completed</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">Quality Control</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-500">2023-06-10</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <button class="text-accent hover:text-secondary mr-3">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="text-primary hover:text-secondary">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap font-medium text-primary">WO-1021</td>
+                                <td class="px-6 py-4 whitespace-nowrap">Industrial Oven</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-danger bg-opacity-10 text-danger">High</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-24 mr-2">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill bg-danger" style="width: 15%"></div>
+                                            </div>
+                                        </div>
+                                        <span>Pending</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">-</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-500">2023-06-12</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <button class="text-accent hover:text-secondary mr-3">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="text-primary hover:text-secondary">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- New Machine Orders Section -->
+        <section class="mb-10">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">New Machine Orders</h2>
+                <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition">
+                    <i class="fas fa-plus mr-2"></i> Request New Machine
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Machine Order Card -->
+                <div class="order-card bg-white rounded-lg shadow-sm overflow-hidden transition duration-300">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">CNC Milling Machine</h3>
+                                <p class="text-sm text-gray-500">Order #MO-2048</p>
+                            </div>
+                            <span class="px-2 py-1 text-xs rounded-full bg-primary bg-opacity-10 text-primary">Processing</span>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-500">Order Date</span>
+                                <span class="font-medium">2023-05-28</span>
+                            </div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-500">Expected Delivery</span>
+                                <span class="font-medium">2023-07-15</span>
+                            </div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-500">Vendor</span>
+                                <span class="font-medium">TechMach Industries</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Total Cost</span>
+                                <span class="font-medium">$48,500</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-xs text-gray-500 mb-1">Approval Status</p>
+                                <div class="flex items-center">
+                                    <div class="h-2 w-2 rounded-full bg-success mr-2"></div>
+                                    <span class="text-sm">Approved by Head Office</span>
+                                </div>
+                            </div>
+                            <button class="text-primary hover:text-secondary">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Machine Order Card -->
+                <div class="order-card bg-white rounded-lg shadow-sm overflow-hidden transition duration-300">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">Robotic Arm</h3>
+                                <p class="text-sm text-gray-500">Order #MO-2047</p>
+                            </div>
+                            <span class="px-2 py-1 text-xs rounded-full bg-warning bg-opacity-10 text-warning">Pending Approval</span>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-500">Order Date</span>
+                                <span class="font-medium">2023-06-02</span>
+                            </div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-500">Expected Delivery</span>
+                                <span class="font-medium">-</span>
+                            </div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-500">Vendor</span>
+                                <span class="font-medium">AutoBotics Inc.</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Total Cost</span>
+                                <span class="font-medium">$32,750</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-xs text-gray-500 mb-1">Approval Status</p>
+                                <div class="flex items-center">
+                                    <div class="h-2 w-2 rounded-full bg-warning mr-2"></div>
+                                    <span class="text-sm">Awaiting Approval</span>
+                                </div>
+                            </div>
+                            <button class="text-primary hover:text-secondary">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Machine Order Card -->
+                <div class="order-card bg-white rounded-lg shadow-sm overflow-hidden transition duration-300">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">Laser Cutter</h3>
+                                <p class="text-sm text-gray-500">Order #MO-2046</p>
+                            </div>
+                            <span class="px-2 py-1 text-xs rounded-full bg-success bg-opacity-10 text-success">Delivered</span>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-500">Order Date</span>
+                                <span class="font-medium">2023-04-15</span>
+                            </div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-500">Delivery Date</span>
+                                <span class="font-medium">2023-05-28</span>
+                            </div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-500">Vendor</span>
+                                <span class="font-medium">Precision Tools Co.</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Total Cost</span>
+                                <span class="font-medium">$27,300</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-xs text-gray-500 mb-1">Installation Status</p>
+                                <div class="flex items-center">
+                                    <div class="h-2 w-2 rounded-full bg-primary mr-2"></div>
+                                    <span class="text-sm">Scheduled for 06/10</span>
+                                </div>
+                            </div>
+                            <button class="text-primary hover:text-secondary">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tasks from Head Office -->
+        <section>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Tasks from Head Office</h2>
+                <a href="#" class="text-primary hover:text-secondary font-medium">View All <i class="fas fa-arrow-right ml-1"></i></a>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="divide-y divide-gray-200">
+                    <!-- Task Item -->
+                    <div class="p-6 hover:bg-gray-50 transition">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-start space-x-4">
+                                <div class="mt-1">
+                                    <input type="checkbox" class="rounded text-primary focus:ring-primary">
+                                </div>
+                                <div>
+                                    <h3 class="font-medium text-gray-800">Prepare quarterly maintenance report</h3>
+                                    <p class="text-sm text-gray-500 mt-1">Include all machine downtime statistics and preventive maintenance performed</p>
+                                    <div class="flex items-center mt-2 space-x-4">
+                                        <span class="flex items-center text-sm text-gray-500">
+                                            <i class="fas fa-calendar-alt mr-1"></i> Due: 2023-06-30
+                                        </span>
+                                        <span class="flex items-center text-sm text-gray-500">
+                                            <i class="fas fa-user-tie mr-1"></i> From: Head Office
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="px-2 py-1 text-xs rounded-full bg-secondary bg-opacity-10 text-secondary">High Priority</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Task Item -->
+                    <div class="p-6 hover:bg-gray-50 transition">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-start space-x-4">
+                                <div class="mt-1">
+                                    <input type="checkbox" class="rounded text-primary focus:ring-primary">
+                                </div>
+                                <div>
+                                    <h3 class="font-medium text-gray-800">Implement new safety protocols</h3>
+                                    <p class="text-sm text-gray-500 mt-1">Review and implement the updated safety guidelines from corporate</p>
+                                    <div class="flex items-center mt-2 space-x-4">
+                                        <span class="flex items-center text-sm text-gray-500">
+                                            <i class="fas fa-calendar-alt mr-1"></i> Due: 2023-07-15
+                                        </span>
+                                        <span class="flex items-center text-sm text-gray-500">
+                                            <i class="fas fa-user-tie mr-1"></i> From: Safety Dept.
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="px-2 py-1 text-xs rounded-full bg-warning bg-opacity-10 text-warning">Medium Priority</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Task Item -->
+                    <div class="p-6 hover:bg-gray-50 transition">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-start space-x-4">
+                                <div class="mt-1">
+                                    <input type="checkbox" class="rounded text-primary focus:ring-primary" checked>
+                                </div>
+                                <div class="opacity-60">
+                                    <h3 class="font-medium text-gray-800 line-through">Submit budget proposal</h3>
+                                    <p class="text-sm text-gray-500 mt-1">Q3 maintenance and equipment budget</p>
+                                    <div class="flex items-center mt-2 space-x-4">
+                                        <span class="flex items-center text-sm text-gray-500">
+                                            <i class="fas fa-calendar-alt mr-1"></i> Due: 2023-05-31
+                                        </span>
+                                        <span class="flex items-center text-sm text-gray-500">
+                                            <i class="fas fa-user-tie mr-1"></i> From: Finance Dept.
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="px-2 py-1 text-xs rounded-full bg-success bg-opacity-10 text-success">Completed</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+     
+    <!--<footer class="bg-gray-100 border-t border-gray-200 py-6 mt-10">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <p class="text-gray-600">&copy; 2023 Work Orders Management System. All rights reserved.</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-600 hover:text-primary transition">Privacy Policy</a>
+                    <a href="#" class="text-gray-600 hover:text-primary transition">Terms of Service</a>
+                    <a href="#" class="text-gray-600 hover:text-primary transition">Contact Support</a>
+                </div>
+            </div>
+        </div>
+    </footer>-->
+
+    <script>
+        // Simple JavaScript for interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle mobile menu (if added later)
+            // Add any dynamic functionality needed
+            
+            // Example: Mark task as complete
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const taskItem = this.closest('.flex.items-start');
+                    if (this.checked) {
+                        taskItem.classList.add('opacity-60');
+                        taskItem.querySelector('h3').classList.add('line-through');
+                    } else {
+                        taskItem.classList.remove('opacity-60');
+                        taskItem.querySelector('h3').classList.remove('line-through');
+                    }
+                });
+            });
+        });
+        
+        // Theme toggle functionality with localStorage persistence
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else if (theme === 'light') {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                // System preference
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                localStorage.setItem('theme', 'system');
+            }
+        }
+        
+        // Apply saved theme on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'system';
+            setTheme(savedTheme);
+        });
+    </script>
+</body>
+</html>

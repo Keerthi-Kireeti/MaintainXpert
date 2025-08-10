@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#1e40af',
+                        accent: '#3b82f6',
+                        danger: '#ef4444',
+                        warning: '#f59e0b',
+                        success: '#10b981',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #2563eb;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #2563eb;
+        }
+        .settings-card {
+            transition: all 0.3s ease;
+        }
+        .settings-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .language-flag {
+            width: 24px;
+            height: 16px;
+            object-fit: cover;
+            border-radius: 2px;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-secondary">
+                <i class="fas fa-cog mr-2"></i> Settings
+            </h1>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <div class="flex items-center cursor-pointer" id="user-menu-button">
+                        <span class="mr-2 text-gray-700">Pruthvi Chevuri</span>
+                        <img class="w-8 h-8 rounded-full" src="pop.jpeg" alt="User profile">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Left Navigation -->
+            <div class="md:col-span-1">
+                <div class="bg-white rounded-lg shadow p-4 sticky top-4">
+                    <h2 class="text-lg font-semibold text-secondary mb-4">Settings Menu</h2>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#appearance" class="flex items-center px-3 py-2 rounded-md bg-primary text-white">
+                                <i class="fas fa-palette mr-2"></i> Appearance
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#language" class="flex items-center px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                                <i class="fas fa-language mr-2"></i> Language
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#account" class="flex items-center px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                                <i class="fas fa-user-cog mr-2"></i> Account
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#security" class="flex items-center px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                                <i class="fas fa-shield-alt mr-2"></i> Security
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#notifications" class="flex items-center px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                                <i class="fas fa-bell mr-2"></i> Notifications
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#privacy" class="flex items-center px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700">
+                                <i class="fas fa-lock mr-2"></i> Privacy
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Right Content -->
+            <div class="md:col-span-2 space-y-6">
+                <!-- Appearance Section -->
+                <div id="appearance" class="settings-card bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold text-secondary mb-4 flex items-center">
+                        <i class="fas fa-palette mr-2"></i> Appearance Settings
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <!-- Theme Selection -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-800 mb-3">Theme Preferences</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="border rounded-lg p-4 cursor-pointer hover:border-accent transition-colors">
+                                    <div class="flex items-center">
+                                        <input id="light-theme" name="theme" type="radio" class="h-4 w-4 text-accent focus:ring-accent" checked>
+                                        <label for="light-theme" class="ml-3 block text-sm font-medium text-gray-700">
+                                            Light Theme
+                                        </label>
+                                    </div>
+                                    <div class="mt-2 h-16 bg-gray-100 rounded-md"></div>
+                                </div>
+                                <div class="border rounded-lg p-4 cursor-pointer hover:border-accent transition-colors">
+                                    <div class="flex items-center">
+                                        <input id="dark-theme" name="theme" type="radio" class="h-4 w-4 text-accent focus:ring-accent">
+                                        <label for="dark-theme" class="ml-3 block text-sm font-medium text-gray-700">
+                                            Dark Theme
+                                        </label>
+                                    </div>
+                                    <div class="mt-2 h-16 bg-gray-800 rounded-md"></div>
+                                </div>
+                                <div class="border rounded-lg p-4 cursor-pointer hover:border-accent transition-colors">
+                                    <div class="flex items-center">
+                                        <input id="system-theme" name="theme" type="radio" class="h-4 w-4 text-accent focus:ring-accent">
+                                        <label for="system-theme" class="ml-3 block text-sm font-medium text-gray-700">
+                                            System Default
+                                        </label>
+                                    </div>
+                                    <div class="mt-2 h-16 bg-gradient-to-r from-gray-100 to-gray-800 rounded-md"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Accent Color -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-800 mb-3">Accent Color</h3>
+                            <div class="flex flex-wrap gap-2">
+                                <div class="w-8 h-8 rounded-full bg-blue-500 cursor-pointer border-2 border-accent"></div>
+                                <div class="w-8 h-8 rounded-full bg-green-500 cursor-pointer"></div>
+                                <div class="w-8 h-8 rounded-full bg-purple-500 cursor-pointer"></div>
+                                <div class="w-8 h-8 rounded-full bg-red-500 cursor-pointer"></div>
+                                <div class="w-8 h-8 rounded-full bg-yellow-500 cursor-pointer"></div>
+                                <div class="w-8 h-8 rounded-full bg-pink-500 cursor-pointer"></div>
+                                <div class="w-8 h-8 rounded-full bg-indigo-500 cursor-pointer"></div>
+                                <div class="w-8 h-8 rounded-full bg-gray-500 cursor-pointer"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Layout Options -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-800 mb-3">Layout Options</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-700">Compact Mode</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-700">Sidebar Position</span>
+                                    <select class="border rounded-md px-3 py-1 text-sm focus:ring-accent focus:border-accent">
+                                        <option>Left</option>
+                                        <option>Right</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Language Section -->
+                <div id="language" class="settings-card bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold text-secondary mb-4 flex items-center">
+                        <i class="fas fa-language mr-2"></i> Language Settings
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <!-- Primary Language -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-800 mb-3">Primary Language</h3>
+                            <select class="w-full border rounded-md px-3 py-2 focus:ring-accent focus:border-accent">
+                                <option value="en" selected>
+                                    <div class="flex items-center">
+                                        <img src="https://flagcdn.com/w20/gb.png" class="language-flag" alt="English">
+                                        English
+                                    </div>
+                                </option>
+                                <option value="es">
+                                    <div class="flex items-center">
+                                        <img src="https://flagcdn.com/w20/es.png" class="language-flag" alt="Spanish">
+                                        Español
+                                    </div>
+                                </option>
+                                <option value="fr">
+                                    <div class="flex items-center">
+                                        <img src="https://flagcdn.com/w20/fr.png" class="language-flag" alt="French">
+                                        Français
+                                    </div>
+                                </option>
+                                <option value="de">
+                                    <div class="flex items-center">
+                                        <img src="https://flagcdn.com/w20/de.png" class="language-flag" alt="German">
+                                        Deutsch
+                                    </div>
+                                </option>
+                                <option value="zh">
+                                    <div class="flex items-center">
+                                        <img src="https://flagcdn.com/w20/cn.png" class="language-flag" alt="Chinese">
+                                        中文
+                                    </div>
+                                </option>
+                            </select>
+                        </div>
+                        
+                        <!-- Secondary Languages -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-800 mb-3">Secondary Languages</h3>
+                            <p class="text-sm text-gray-600 mb-3">Select additional languages you're comfortable with (used for multilingual support)</p>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input id="lang-es" type="checkbox" class="h-4 w-4 text-accent focus:ring-accent border-gray-300 rounded">
+                                    <label for="lang-es" class="ml-2 block text-sm text-gray-700 flex items-center">
+                                        <img src="https://flagcdn.com/w20/es.png" class="language-flag" alt="Spanish">
+                                        Español
+                                    </label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="lang-fr" type="checkbox" class="h-4 w-4 text-accent focus:ring-accent border-gray-300 rounded">
+                                    <label for="lang-fr" class="ml-2 block text-sm text-gray-700 flex items-center">
+                                        <img src="https://flagcdn.com/w20/fr.png" class="language-flag" alt="French">
+                                        Français
+                                    </label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="lang-de" type="checkbox" class="h-4 w-4 text-accent focus:ring-accent border-gray-300 rounded">
+                                    <label for="lang-de" class="ml-2 block text-sm text-gray-700 flex items-center">
+                                        <img src="https://flagcdn.com/w20/de.png" class="language-flag" alt="German">
+                                        Deutsch
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Section -->
+                <div id="account" class="settings-card bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold text-secondary mb-4 flex items-center">
+                        <i class="fas fa-user-cog mr-2"></i> Account Settings
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <!-- Profile Information -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-800 mb-3">Profile Information</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="first-name" class="block text-sm font-medium text-gray-700">First Name</label>
+                                    <input type="text" id="first-name" class="mt-1 block w-full border rounded-md px-3 py-2 focus:ring-accent focus:border-accent" value="Pruthvi">
+                                </div>
+                                <div>
+                                    <label for="last-name" class="block text-sm font-medium text-gray-700">Last Name</label>
+                                    <input type="text" id="last-name" class="mt-1 block w-full border rounded-md px-3 py-2 focus:ring-accent focus:border-accent" value="Chevuri">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                                    <input type="email" id="email" class="mt-1 block w-full border rounded-md px-3 py-2 focus:ring-accent focus:border-accent" value="manager@gmail.com">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Profile Picture -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-800 mb-3">Profile Picture</h3>
+                            <div class="flex items-center">
+                                <img class="w-16 h-16 rounded-full" src="pop.jpeg" alt="Current profile">
+                                <div class="ml-4">
+                                    <button type="button" class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent">
+                                        <i class="fas fa-upload mr-2"></i> Upload New
+                                    </button>
+                                    <button type="button" class="ml-3 inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent">
+                                        <i class="fas fa-trash-alt mr-2"></i> Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Save Changes -->
+                        <div class="flex justify-end">
+                            <button type="button" class="px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent">
+                                Save Profile Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Section -->
+                <div id="security" class="settings-card bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold text-secondary mb-4 flex items-center">
+                        <i class="fas fa-shield-alt mr-2"></i> Security Settings
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <!-- Password Change -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-800 mb-3">Change Password</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="current-password" class="block text-sm font-medium text-gray-700">Current Password</label>
+                                    <input type="password" id="current-password" class="mt-1 block w-full border rounded-md px-3 py-2 focus:ring-accent focus:border-accent">
+                                </div>
+                                <div>
+                                    <label for="new-password" class="block text-sm font-medium text-gray-700">New Password</label>
+                                    <input type="password" id="new-password" class="mt-1 block w-full border rounded-md px-3 py-2 focus:ring-accent focus:border-accent">
+                                    <p class="mt-1 text-xs text-gray-500">Password must be at least 8 characters long</p>
+                                </div>
+                                <div>
+                                    <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                                    <input type="password" id="confirm-password" class="mt-1 block w-full border rounded-md px-3 py-2 focus:ring-accent focus:border-accent">
+                                </div>
+                                <div class="flex justify-end">
+                                    <button type="button" class="px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent">
+                                        Update Password
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Two-Factor Authentication -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-800 mb-3">Two-Factor Authentication</h3>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-700">Status: <span class="font-medium">Disabled</span></p>
+                                    <p class="text-xs text-gray-500">Add an extra layer of security to your account</p>
+                                </div>
+                                <button type="button" class="px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent">
+                                    Enable 2FA
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Active Sessions -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-800 mb-3">Active Sessions</h3>
+                            <div class="border rounded-md divide-y">
+                                <div class="p-3 flex items-center justify-between">
+                                    <div>
+                                        <p class="font-medium">Chrome on Windows</p>
+                                        <p class="text-sm text-gray-500">New York, USA • Last active 2 hours ago</p>
+                                    </div>
+                                    <button type="button" class="text-sm text-danger hover:text-red-700">Log out</button>
+                                </div>
+                                <div class="p-3 flex items-center justify-between">
+                                    <div>
+                                        <p class="font-medium">Safari on iPhone</p>
+                                        <p class="text-sm text-gray-500">San Francisco, USA • Last active 1 day ago</p>
+                                    </div>
+                                    <button type="button" class="text-sm text-danger hover:text-red-700">Log out</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications Section -->
+                <div id="notifications" class="settings-card bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold text-secondary mb-4 flex items-center">
+                        <i class="fas fa-bell mr-2"></i> Notification Settings
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <!-- Email Notifications -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-800 mb-3">Email Notifications</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700">System Messages</p>
+                                        <p class="text-xs text-gray-500">Important updates about your account</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700">Security Alerts</p>
+                                        <p class="text-xs text-gray-500">Receive alerts for security events</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700">Marketing Communications</p>
+                                        <p class="text-xs text-gray-500">News, offers and promotions</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Push Notifications -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-800 mb-3">Push Notifications</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700">New Messages</p>
+                                        <p class="text-xs text-gray-500">When you receive new direct messages</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700">Task Updates</p>
+                                        <p class="text-xs text-gray-500">When your tasks are updated</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Privacy Section -->
+                <div id="privacy" class="settings-card bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold text-secondary mb-4 flex items-center">
+                        <i class="fas fa-lock mr-2"></i> Privacy Settings
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <!-- Data Sharing -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-800 mb-3">Data Sharing</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700">Share analytics data</p>
+                                        <p class="text-xs text-gray-500">Help us improve by sharing anonymous usage data</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700">Personalized recommendations</p>
+                                        <p class="text-xs text-gray-500">Get recommendations based on your usage</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Privacy Controls -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-800 mb-3">Privacy Controls</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700">Make profile visible to team members</p>
+                                        <p class="text-xs text-gray-500">Other users in your organization can see your profile</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700">Allow search engines to index profile</p>
+                                        <p class="text-xs text-gray-500">Your profile may appear in search results</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Data Management -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-800 mb-3">Data Management</h3>
+                            <div class="space-y-3">
+                                <button type="button" class="w-full flex justify-between items-center px-4 py-3 bg-gray-50 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+                                    <span>Download your data</span>
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button type="button" class="w-full flex justify-between items-center px-4 py-3 bg-gray-50 text-sm font-medium text-danger rounded-md hover:bg-gray-100">
+                                    <span>Delete account</span>
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme toggle functionality with localStorage persistence
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else if (theme === 'light') {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                // System preference
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                localStorage.setItem('theme', 'system');
+            }
+        }
+        
+        // Apply saved theme on page load and set up event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'system';
+            const darkThemeRadio = document.getElementById('dark-theme');
+            const lightThemeRadio = document.getElementById('light-theme');
+            const systemThemeRadio = document.getElementById('system-theme');
+            
+            // Set the radio button based on saved theme
+            if (savedTheme === 'dark') {
+                darkThemeRadio.checked = true;
+            } else if (savedTheme === 'light') {
+                lightThemeRadio.checked = true;
+            } else {
+                systemThemeRadio.checked = true;
+            }
+            
+            // Apply the theme
+            setTheme(savedTheme);
+            
+            // Theme change event listeners
+            darkThemeRadio.addEventListener('change', function() {
+                if(this.checked) {
+                    setTheme('dark');
+                }
+            });
+            
+            lightThemeRadio.addEventListener('change', function() {
+                if(this.checked) {
+                    setTheme('light');
+                }
+            });
+            
+            systemThemeRadio.addEventListener('change', function() {
+                if(this.checked) {
+                    setTheme('system');
+                }
+            });
+        });
+        
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictive Alerts - MaintainXpert</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#1e40af',
+                        accent: '#3b82f6',
+                        danger: '#ef4444',
+                        warning: '#f59e0b',
+                        success: '#10b981'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        .sidebar.collapsed {
+            width: 80px;
+            overflow: hidden;
+        }
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+        .sidebar.collapsed .logo-text {
+            display: none;
+        }
+        .sidebar.collapsed .user-name {
+            display: none;
+        }
+        .sidebar.collapsed .user-role {
+            display: none;
+        }
+        .sidebar.collapsed .menu-title {
+            display: none;
+        }
+        .main-content {
+            transition: all 0.3s ease;
+            margin-left: 256px;
+        }
+        .sidebar.collapsed ~ .main-content {
+            margin-left: 80px;
+        }
+        @media (max-width: 768px) {
+            .sidebar.collapsed ~ .main-content {
+                margin-left: 0;
+            }
+        }
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                z-index: 1000;
+                height: 100vh;
+            }
+            .sidebar.collapsed {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+        .alert-card {
+            transition: all 0.3s ease;
+        }
+        .alert-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e5e7eb;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-white w-64 border-r border-gray-200 flex flex-col">
+            <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-cogs text-primary text-xl"></i>
+                    <h1 class="text-xl font-bold text-primary ml-2 sidebar-text logo-text">MaintainXpert</h1>
+                </div>
+                <button class="text-gray-500 hover:text-gray-700 sidebar-toggle hidden md:block">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto">
+                <nav class="p-4">
+                    <div class="mb-6">
+                        <p class="text-xs uppercase text-gray-500 font-semibold mb-2 menu-title">Main Menu</p>
+                        <ul>
+                            <li class="mb-1">
+                                <a href="supervisor.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-tachometer-alt mr-3"></i>
+                                    <span class="sidebar-text">Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="machineScanner.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-qrcode mr-3"></i>
+                                    <span class="sidebar-text">Machine Scanner</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="maintenance.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-tools mr-3"></i>
+                                    <span class="sidebar-text">Maintenance</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="Snotifications.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg relative">
+                                    <i class="fas fa-bell mr-3"></i>
+                                    <span class="sidebar-text">Notifications</span>
+                                    <span class="notification-badge">5</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="reports.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-chart-bar mr-3"></i>
+                                    <span class="sidebar-text">Reports</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="PredictiveAlerts.html" class="flex items-center p-2 text-primary bg-blue-50 rounded-lg">
+                                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                                    <span class="sidebar-text">Predictive Alerts</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="SensorSimulation.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-microchip mr-3"></i>
+                                    <span class="sidebar-text">Sensor Simulation</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="OverdueTasks.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-clock mr-3"></i>
+                                    <span class="sidebar-text">Overdue Tasks</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="AInotify.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-robot mr-3"></i>
+                                    <span class="sidebar-text">AI Notify</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mb-6">
+                        <p class="text-xs uppercase text-gray-500 font-semibold mb-2 menu-title">Administration</p>
+                        <ul>
+                            <li class="mb-1">
+                                <a href="#users" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-users mr-3"></i>
+                                    <span class="sidebar-text">Users</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="Ssettings.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-cog mr-3"></i>
+                                    <span class="sidebar-text">Settings</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+            <div class="p-4 border-t border-gray-200">
+                <div class="flex items-center justify-between w-full">
+                    <!-- Profile + Name -->
+                    <div class="flex items-center space-x-2">
+                        <img src="sanjay.jpeg" alt="User" class="w-8 h-8 rounded-full">
+                        <div class="leading-tight">
+                            <p class="text-sm font-medium user-name">Sanjay Atmakuri</p>
+                            <p class="text-xs text-gray-500 user-role">Supervisor</p>
+                        </div>
+                    </div>
+                    <!-- Logout Icon -->
+                    <button onclick="logout()" title="Logout" class="sidebar-text">
+                        <i class="fas fa-sign-out-alt text-gray-500 hover:text-red-600 text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto main-content">
+            <!-- Header -->
+            <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+                <button class="text-gray-600 md:hidden" id="mobileSidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h2 class="text-lg font-semibold text-gray-800">Predictive Alerts</h2>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <a href="Snotifications.html" class="text-gray-600 hover:text-gray-800">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">5</span>
+                        </a>
+                    </div>
+                    <div class="flex items-center">
+                        <img src="sanjay.jpeg" alt="User" class="w-8 h-8 rounded-full mr-2">
+                        <span class="hidden md:inline">Sanjay Atmakuri</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="p-4">
+                <!-- Alert Summary -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-red-100 text-danger mr-4">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Critical Alerts</p>
+                                <p class="text-2xl font-bold">3</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-yellow-100 text-warning mr-4">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Warning Alerts</p>
+                                <p class="text-2xl font-bold">7</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-blue-100 text-primary mr-4">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Informational</p>
+                                <p class="text-2xl font-bold">12</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alert Filters -->
+                <div class="bg-white p-4 rounded-lg shadow mb-6">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex items-center space-x-2">
+                            <h3 class="text-lg font-semibold">Alert Filters</h3>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="px-3 py-1 bg-primary text-white rounded-md hover:bg-secondary">All Alerts</button>
+                            <button class="px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100">Critical</button>
+                            <button class="px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100">Warning</button>
+                            <button class="px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100">Informational</button>
+                        </div>
+                        <div class="relative">
+                            <input type="text" placeholder="Search alerts..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                            <i class="fas fa-search absolute right-3 top-2.5 text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Critical Alerts -->
+                <div class="bg-white p-4 rounded-lg shadow mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold">Critical Alerts</h3>
+                        <button class="text-primary text-sm font-medium">View All</button>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="alert-card p-4 border-l-4 border-danger bg-red-50 rounded-r-lg">
+                            <div class="flex items-start">
+                                <i class="fas fa-exclamation-circle text-danger mt-1 mr-3 text-xl"></i>
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="font-medium">Machine #12 - Hydraulic Press</p>
+                                            <p class="text-sm text-gray-600">Vibration levels exceeded threshold (12.7mm/s). Immediate inspection required.</p>
+                                        </div>
+                                        <span class="text-xs text-white bg-danger px-2 py-1 rounded-full">Critical</span>
+                                    </div>
+                                    <div class="mt-2 flex items-center justify-between">
+                                        <p class="text-xs text-gray-500">2 hours ago</p>
+                                        <div class="flex space-x-2">
+                                            <button class="px-2 py-1 text-xs bg-primary text-white rounded hover:bg-secondary">Assign</button>
+                                            <button class="px-2 py-1 text-xs bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-100">Details</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert-card p-4 border-l-4 border-danger bg-red-50 rounded-r-lg">
+                            <div class="flex items-start">
+                                <i class="fas fa-exclamation-circle text-danger mt-1 mr-3 text-xl"></i>
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="font-medium">Machine #5 - CNC Machine</p>
+                                            <p class="text-sm text-gray-600">Temperature spike detected (95°C). Cooling system failure suspected.</p>
+                                        </div>
+                                        <span class="text-xs text-white bg-danger px-2 py-1 rounded-full">Critical</span>
+                                    </div>
+                                    <div class="mt-2 flex items-center justify-between">
+                                        <p class="text-xs text-gray-500">45 minutes ago</p>
+                                        <div class="flex space-x-2">
+                                            <button class="px-2 py-1 text-xs bg-primary text-white rounded hover:bg-secondary">Assign</button>
+                                            <button class="px-2 py-1 text-xs bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-100">Details</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Warning Alerts -->
+                <div class="bg-white p-4 rounded-lg shadow mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold">Warning Alerts</h3>
+                        <button class="text-primary text-sm font-medium">View All</button>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="alert-card p-4 border-l-4 border-warning bg-yellow-50 rounded-r-lg">
+                            <div class="flex items-start">
+                                <i class="fas fa-exclamation-triangle text-warning mt-1 mr-3 text-xl"></i>
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="font-medium">Machine #8 - CNC Router</p>
+                                            <p class="text-sm text-gray-600">Preventive maintenance overdue by 3 days. Scheduled for lubrication and belt inspection.</p>
+                                        </div>
+                                        <span class="text-xs text-white bg-warning px-2 py-1 rounded-full">Warning</span>
+                                    </div>
+                                    <div class="mt-2 flex items-center justify-between">
+                                        <p class="text-xs text-gray-500">5 hours ago</p>
+                                        <div class="flex space-x-2">
+                                            <button class="px-2 py-1 text-xs bg-primary text-white rounded hover:bg-secondary">Schedule</button>
+                                            <button class="px-2 py-1 text-xs bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-100">Details</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert-card p-4 border-l-4 border-warning bg-yellow-50 rounded-r-lg">
+                            <div class="flex items-start">
+                                <i class="fas fa-exclamation-triangle text-warning mt-1 mr-3 text-xl"></i>
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="font-medium">Machine #3 - Packaging Machine</p>
+                                            <p class="text-sm text-gray-600">Unusual power consumption pattern detected. Energy efficiency check recommended.</p>
+                                        </div>
+                                        <span class="text-xs text-white bg-warning px-2 py-1 rounded-full">Warning</span>
+                                    </div>
+                                    <div class="mt-2 flex items-center justify-between">
+                                        <p class="text-xs text-gray-500">Yesterday, 2:30 PM</p>
+                                        <div class="flex space-x-2">
+                                            <button class="px-2 py-1 text-xs bg-primary text-white rounded hover:bg-secondary">Schedule</button>
+                                            <button class="px-2 py-1 text-xs bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-100">Details</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Predictive Analytics -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold mb-4">Failure Prediction</h3>
+                        <div class="chart-container">
+                            <canvas id="failurePredictionChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold mb-4">Alert Trends</h3>
+                        <div class="chart-container">
+                            <canvas id="alertTrendsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Machine Health Indicators -->
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold">Machine Health Indicators</h3>
+                        <select class="border rounded-md px-3 py-1 text-sm focus:ring-primary focus:border-primary">
+                            <option>Last 24 Hours</option>
+                            <option>Last 7 Days</option>
+                            <option>Last 30 Days</option>
+                        </select>
+                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <div>
+                                    <span class="font-medium">Machine #12 - Hydraulic Press</span>
+                                    <span class="ml-2 text-xs px-2 py-0.5 bg-red-100 text-danger rounded-full">Critical</span>
+                                </div>
+                                <span class="text-sm text-gray-500">Vibration Level</span>
+                            </div>
+                            <div class="relative w-full mb-1">
+                                <div class="progress-bar">
+                                    <div class="progress-fill bg-danger" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span>0 mm/s</span>
+                                <span>12.7 mm/s</span>
+                                <span>15 mm/s</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <div>
+                                    <span class="font-medium">Machine #5 - CNC Machine</span>
+                                    <span class="ml-2 text-xs px-2 py-0.5 bg-red-100 text-danger rounded-full">Critical</span>
+                                </div>
+                                <span class="text-sm text-gray-500">Temperature</span>
+                            </div>
+                            <div class="relative w-full mb-1">
+                                <div class="progress-bar">
+                                    <div class="progress-fill bg-danger" style="width: 90%"></div>
+                                </div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span>0°C</span>
+                                <span>95°C</span>
+                                <span>100°C</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <div>
+                                    <span class="font-medium">Machine #8 - CNC Router</span>
+                                    <span class="ml-2 text-xs px-2 py-0.5 bg-yellow-100 text-warning rounded-full">Warning</span>
+                                </div>
+                                <span class="text-sm text-gray-500">Belt Wear</span>
+                            </div>
+                            <div class="relative w-full mb-1">
+                                <div class="progress-bar">
+                                    <div class="progress-fill bg-warning" style="width: 65%"></div>
+                                </div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span>New</span>
+                                <span>65% Worn</span>
+                                <span>Replace</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Sidebar toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
+            const mainContent = document.querySelector('.main-content');
+            
+            // Desktop toggle
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    
+                    // Change the icon based on state
+                    const icon = sidebarToggle.querySelector('i');
+                    if (sidebar.classList.contains('collapsed')) {
+                        icon.classList.remove('fa-chevron-left');
+                        icon.classList.add('fa-chevron-right');
+                    } else {
+                        icon.classList.remove('fa-chevron-right');
+                        icon.classList.add('fa-chevron-left');
+                    }
+                });
+            }
+            
+            // Mobile toggle
+            if (mobileSidebarToggle) {
+                mobileSidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    // On mobile, we want to push content when sidebar is open
+                    if (window.innerWidth <= 768) {
+                        if (sidebar.classList.contains('collapsed')) {
+                            mainContent.style.marginLeft = '0';
+                        } else {
+                            mainContent.style.marginLeft = '256px';
+                        }
+                    }
+                });
+            }
+            
+            // Initialize Charts
+            const failurePredictionCtx = document.getElementById('failurePredictionChart').getContext('2d');
+            const failurePredictionChart = new Chart(failurePredictionCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Machine #1', 'Machine #5', 'Machine #8', 'Machine #12', 'Machine #15'],
+                    datasets: [{
+                        label: 'Failure Probability (%)',
+                        data: [15, 78, 45, 92, 23],
+                        backgroundColor: [
+                            '#3b82f6',
+                            '#ef4444',
+                            '#f59e0b',
+                            '#ef4444',
+                            '#3b82f6'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+            
+            const alertTrendsCtx = document.getElementById('alertTrendsChart').getContext('2d');
+            const alertTrendsChart = new Chart(alertTrendsCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Critical Alerts',
+                        data: [3, 5, 2, 7, 4, 3],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Warning Alerts',
+                        data: [7, 9, 12, 8, 10, 7],
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Logout function
+            window.logout = function() {
+                window.location.href = 'index.html';
+            };
+            
+            // Theme toggle functionality with localStorage persistence
+            function setTheme(theme) {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                } else if (theme === 'light') {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    // System preference
+                    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                    localStorage.setItem('theme', 'system');
+                }
+            }
+            
+            // Apply saved theme on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                const savedTheme = localStorage.getItem('theme') || 'system';
+                setTheme(savedTheme);
+            });
+        });
+    </script>
+</body>
+</html>

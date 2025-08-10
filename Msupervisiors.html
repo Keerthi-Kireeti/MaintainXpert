@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supervisors</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#1e40af',
+                        accent: '#3b82f6',
+                        danger: '#ef4444',
+                        warning: '#f59e0b',
+                        success: '#10b981',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.5s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        .floating-btn {
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Navigation -->
+    <nav class="bg-primary text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-user-tie text-2xl mr-2"></i>
+                        <span class="text-xl font-bold">Supervisors</span>
+                    </div>
+                </div>
+                <!--<div class="hidden md:block">
+                    <div class="ml-10 flex items-center space-x-4">
+                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium bg-secondary">Dashboard</a>
+                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-accent">Supervisors</a>
+                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-accent">Reports</a>
+                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-accent">Machines</a>
+                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-accent">Settings</a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <div class="relative ml-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="hidden md:block">John Doe</span>
+                            <img class="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
+                        </div>
+                    </div>
+                </div>-->
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Supervisors</h1>
+            <p class="mt-2 text-gray-600">Monitor performance, machine efficiency, and issue resolution</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-primary bg-opacity-10 text-primary mr-4">
+                        <i class="fas fa-users text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Total Supervisors</p>
+                        <h3 class="text-2xl font-bold">24</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-success bg-opacity-10 text-success mr-4">
+                        <i class="fas fa-wrench text-xl"></i>
+
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Active Mechanic</p>
+                        <h3 class="text-2xl font-bold">36</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-warning bg-opacity-10 text-warning mr-4">
+                        <i class="fas fa-exclamation-triangle text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Pending Issues</p>
+                        <h3 class="text-2xl font-bold">12</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-danger bg-opacity-10 text-danger mr-4">
+                        <i class="fas fa-tachometer-alt text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Avg. Efficiency</p>
+                        <h3 class="text-2xl font-bold">87%</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Performance Charts -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-800">Supervisor Performance</h2>
+                        <select class="border border-gray-300 rounded-md px-3 py-1 text-sm">
+                            <option>Last 7 Days</option>
+                            <option>Last 30 Days</option>
+                            <option>Last 90 Days</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Supervisors List -->
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-xl font-bold text-gray-800">Supervisors List</h2>
+                    </div>
+                    <div class="divide-y divide-gray-200">
+                        <!-- Supervisor 1 -->
+                        <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center">
+                                <img class="h-10 w-10 rounded-full mr-4" src="sanjay.jpeg" alt="Sanjay Atmakuri">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate">Sanjay Atmakuri</p>
+                                    <p class="text-sm text-gray-500 truncate">Manufacturing Plant A</p>
+                                </div>
+                                <div class="ml-4 flex-shrink-0 flex">
+                                    <div class="relative">
+                                        <svg class="h-12 w-12" viewBox="0 0 36 36">
+                                            <circle class="text-gray-200" stroke-width="2" stroke="currentColor" fill="none" cx="18" cy="18" r="16"></circle>
+                                            <circle class="text-success" stroke-width="2" stroke-dasharray="100, 100" stroke-dashoffset="25" stroke-linecap="round" stroke="currentColor" fill="none" cx="18" cy="18" r="16"></circle>
+                                            <text x="18" y="20.5" text-anchor="middle" class="text-xs font-bold fill-current text-gray-500">75%</text>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Supervisor 2 -->
+                        <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center">
+                                <img class="h-10 w-10 rounded-full mr-4" src="kk.jpeg" alt="keerthi kireeti">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate">keerthi kireeti</p>
+                                    <p class="text-sm text-gray-500 truncate">Warehouse B</p>
+                                </div>
+                                <div class="ml-4 flex-shrink-0 flex">
+                                    <div class="relative">
+                                        <svg class="h-12 w-12" viewBox="0 0 36 36">
+                                            <circle class="text-gray-200" stroke-width="2" stroke="currentColor" fill="none" cx="18" cy="18" r="16"></circle>
+                                            <circle class="text-primary" stroke-width="2" stroke-dasharray="100, 100" stroke-dashoffset="15" stroke-linecap="round" stroke="currentColor" fill="none" cx="18" cy="18" r="16"></circle>
+                                            <text x="18" y="20.5" text-anchor="middle" class="text-xs font-bold fill-current text-gray-700">85%</text>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Supervisor 3 -->
+                        <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center">
+                                <img class="h-10 w-10 rounded-full mr-4" src="sai.jpeg" alt="Sainadh Maharaj">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate">Sainadh Maharaj</p>
+                                    <p class="text-sm text-gray-500 truncate">Assembly Line C</p>
+                                </div>
+                                <div class="ml-4 flex-shrink-0 flex">
+                                    <div class="relative">
+                                        <svg class="h-12 w-12" viewBox="0 0 36 36">
+                                            <circle class="text-gray-200" stroke-width="2" stroke="currentColor" fill="none" cx="18" cy="18" r="16"></circle>
+                                            <circle class="text-warning" stroke-width="2" stroke-dasharray="100, 100" stroke-dashoffset="40" stroke-linecap="round" stroke="currentColor" fill="none" cx="18" cy="18" r="16"></circle>
+                                            <text x="18" y="20.5" text-anchor="middle" class="text-xs font-bold fill-current text-gray-700">60%</text>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Supervisor 4 -->
+                        <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center">
+                                <img class="h-10 w-10 rounded-full mr-4" src="dinesh.jpeg" alt="Dinesh Sai">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate">Dinesh Sai</p>
+                                    <p class="text-sm text-gray-500 truncate">Packaging Dept.</p>
+                                </div>
+                                <div class="ml-4 flex-shrink-0 flex">
+                                    <div class="relative">
+                                        <svg class="h-12 w-12" viewBox="0 0 36 36">
+                                            <circle class="text-gray-200" stroke-width="2" stroke="currentColor" fill="none" cx="18" cy="18" r="16"></circle>
+                                            <circle class="text-danger" stroke-width="2" stroke-dasharray="100, 100" stroke-dashoffset="50" stroke-linecap="round" stroke="currentColor" fill="none" cx="18" cy="18" r="16"></circle>
+                                            <text x="18" y="20.5" text-anchor="middle" class="text-xs font-bold fill-current text-gray-700">50%</text>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-6 py-4 bg-gray-50 text-center">
+                        <button class="text-primary hover:text-secondary font-medium">View All Supervisors</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="space-y-6">
+                <!-- Machine Efficiency -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-6">Machine Efficiency</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm font-medium text-gray-700">Injection Molder</span>
+                                <span class="text-sm font-medium text-gray-700">92%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-success h-2.5 rounded-full" style="width: 92%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm font-medium text-gray-700">CNC Machine</span>
+                                <span class="text-sm font-medium text-gray-700">85%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-primary h-2.5 rounded-full" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm font-medium text-gray-700">Packaging Line</span>
+                                <span class="text-sm font-medium text-gray-700">78%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-warning h-2.5 rounded-full" style="width: 78%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm font-medium text-gray-700">Assembly Robot</span>
+                                <span class="text-sm font-medium text-gray-700">65%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-danger h-2.5 rounded-full" style="width: 65%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Issues -->
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-xl font-bold text-gray-800">Recent Issues</h2>
+                    </div>
+                    <div class="divide-y divide-gray-200">
+                        <div class="px-6 py-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-danger bg-opacity-10">
+                                        <i class="fas fa-exclamation text-danger"></i>
+                                    </span>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-900">CNC Machine overheating</p>
+                                    <p class="text-sm text-gray-500">Reported by Michael Chen</p>
+                                    <p class="mt-1 text-xs text-gray-500">2 hours ago</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="px-6 py-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-warning bg-opacity-10">
+                                        <i class="fas fa-tools text-warning"></i>
+                                    </span>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-900">Conveyor belt misalignment</p>
+                                    <p class="text-sm text-gray-500">Reported by Sarah Johnson</p>
+                                    <p class="mt-1 text-xs text-gray-500">5 hours ago</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="px-6 py-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-primary bg-opacity-10">
+                                        <i class="fas fa-info-circle text-primary"></i>
+                                    </span>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-900">Software update required</p>
+                                    <p class="text-sm text-gray-500">Reported by Lisa Rodriguez</p>
+                                    <p class="mt-1 text-xs text-gray-500">1 day ago</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-6 py-4 bg-gray-50">
+                        <button class="w-full bg-primary hover:bg-secondary text-white py-2 px-4 rounded-md transition-colors">
+                            Report New Issue
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Website Usage -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-6">Website Usage</h2>
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <p class="text-sm text-gray-500">Active Supervisors</p>
+                            <p class="text-2xl font-bold">18/24</p>
+                        </div>
+                        <div class="relative" style="width: 100px; height: 100px;">
+                            <svg class="w-full h-full" viewBox="0 0 36 36">
+                                <circle cx="18" cy="18" r="16" fill="none" class="stroke-gray-200" stroke-width="2"></circle>
+                                <circle cx="18" cy="18" r="16" fill="none" class="stroke-accent" stroke-width="2" stroke-dasharray="100" stroke-dashoffset="25" stroke-linecap="round"></circle>
+                                <text x="18" y="20.5" text-anchor="middle" class="text-sm font-bold fill-current text-gray-700">75%</text>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Issue Reports</span>
+                            <span class="text-sm font-medium">42 this week</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Updates Made</span>
+                            <span class="text-sm font-medium">28 this week</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Avg. Session</span>
+                            <span class="text-sm font-medium">12.5 min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="fixed bottom-8 right-8 bg-accent text-white rounded-full p-4 floating-btn hover:bg-secondary transition-colors">
+        <i class="fas fa-plus text-xl"></i>
+    </button>
+
+     
+     <!--<footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="md:flex md:items-center md:justify-between">
+                <div class="flex justify-center md:order-2 space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-gray-500">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-gray-500">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-gray-500">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                </div>
+                <div class="mt-8 md:mt-0 md:order-1">
+                    <p class="text-center text-base text-gray-400">
+                        &copy; 2023 Supervisors Dashboard. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>-->
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Performance Chart
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        const performanceChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Sarah J.', 'Michael C.', 'Lisa R.', 'David W.', 'Robert K.', 'Emma L.'],
+                datasets: [
+                    {
+                        label: 'Machine Efficiency',
+                        data: [85, 92, 78, 65, 88, 75],
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Issue Resolution',
+                        data: [90, 85, 70, 60, 80, 78],
+                        backgroundColor: '#10b981',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Website Activity',
+                        data: [80, 88, 65, 50, 75, 70],
+                        backgroundColor: '#f59e0b',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.raw + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Progress rings for supervisor list
+        document.addEventListener('DOMContentLoaded', function() {
+            const circles = document.querySelectorAll('.progress-ring__circle');
+            const radius = 16;
+            const circumference = 2 * Math.PI * radius;
+            
+            circles.forEach(circle => {
+                const percent = parseFloat(circle.textContent) / 100;
+                const offset = circumference - percent * circumference;
+                circle.style.strokeDasharray = circumference;
+                circle.style.strokeDashoffset = offset;
+            });
+        });
+        
+        // Theme toggle functionality with localStorage persistence
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else if (theme === 'light') {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                // System preference
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                localStorage.setItem('theme', 'system');
+            }
+        }
+        
+        // Apply saved theme on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'system';
+            setTheme(savedTheme);
+        });
+    </script>
+</body>
+</html>

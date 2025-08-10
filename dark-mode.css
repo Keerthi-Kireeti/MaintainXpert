@@ -1,0 +1,198 @@
+/* Dark Mode CSS for MaintainXpert */
+
+/* Dark mode variables with improved dark grey shades */
+:root {
+  --dark-bg-primary: #1a1a1a;        /* Dark grey background */
+  --dark-bg-secondary: #2d2d2d;      /* Slightly lighter dark grey */
+  --dark-bg-tertiary: #3d3d3d;       /* Even lighter dark grey */
+  --dark-text-primary: #e0e0e0;      /* Light grey text */
+  --dark-text-secondary: #b0b0b0;    /* Medium grey text */
+  --dark-border: #4d4d4d;            /* Dark grey border */
+  --dark-card-bg: #252525;           /* Card background */
+  --dark-hover-bg: #383838;          /* Hover background */
+  --dark-input-bg: #2a2a2a;          /* Input background */
+  --dark-input-border: #454545;     /* Input border */
+  --dark-sidebar-bg: #1f1f1f;        /* Sidebar background */
+  --dark-header-bg: #222222;         /* Header background */
+}
+
+/* Apply dark mode styles when the dark class is present on the html element */
+html.dark {
+  /* Background colors */
+  background-color: var(--dark-bg-primary);
+  color: var(--dark-text-primary);
+}
+
+html.dark body {
+  background-color: var(--dark-bg-primary);
+  color: var(--dark-text-primary);
+}
+
+/* Card and container elements */
+html.dark .bg-white {
+  background-color: var(--dark-card-bg);
+  color: var(--dark-text-primary);
+  border-color: var(--dark-border);
+}
+
+html.dark .bg-gray-50 {
+  background-color: var(--dark-bg-secondary);
+}
+
+html.dark .bg-gray-100 {
+  background-color: var(--dark-bg-secondary);
+}
+
+/* Text colors */
+html.dark .text-gray-500 {
+  color: var(--dark-text-secondary);
+}
+
+html.dark .text-gray-600 {
+  color: var(--dark-text-secondary);
+}
+
+html.dark .text-gray-700 {
+  color: var(--dark-text-primary);
+}
+
+html.dark .text-gray-800 {
+  color: var(--dark-text-primary);
+}
+
+html.dark .text-gray-900 {
+  color: var(--dark-text-primary);
+}
+
+/* Form elements */
+html.dark input,
+html.dark select,
+html.dark textarea {
+  background-color: var(--dark-input-bg);
+  border-color: var(--dark-input-border);
+  color: var(--dark-text-primary);
+}
+
+html.dark input:focus,
+html.dark select:focus,
+html.dark textarea:focus {
+  border-color: #63b3ed;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+}
+
+html.dark .border {
+  border-color: var(--dark-border);
+}
+
+html.dark .border-gray-200 {
+  border-color: var(--dark-border);
+}
+
+html.dark .border-gray-300 {
+  border-color: var(--dark-border);
+}
+
+/* Table elements */
+html.dark .divide-y > :not([hidden]) ~ :not([hidden]) {
+  border-top-color: var(--dark-border);
+}
+
+/* Hover effects */
+html.dark .hover\:bg-gray-50:hover {
+  background-color: var(--dark-hover-bg);
+}
+
+html.dark .hover\:bg-gray-100:hover {
+  background-color: var(--dark-hover-bg);
+}
+
+/* Buttons */
+html.dark .text-gray-700 {
+  color: var(--dark-text-primary);
+}
+
+html.dark .bg-white {
+  background-color: var(--dark-card-bg);
+  border-color: var(--dark-border);
+}
+
+/* Sidebar */
+html.dark .sidebar {
+  background-color: var(--dark-sidebar-bg);
+  border-color: var(--dark-border);
+}
+
+/* Navigation */
+html.dark .text-gray-700:hover {
+  background-color: var(--dark-hover-bg);
+}
+
+/* Shadow effects - reduce opacity for dark mode */
+html.dark .shadow {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+html.dark .shadow-sm {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+html.dark .shadow-xl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* Chart containers */
+html.dark .bg-red-50 {
+  background-color: rgba(220, 38, 38, 0.1);
+}
+
+html.dark .bg-yellow-50 {
+  background-color: rgba(234, 179, 8, 0.1);
+}
+
+/* Notification badges */
+html.dark .notification-badge {
+  background-color: #f56565;
+}
+
+/* Status indicators */
+html.dark .border-l-4 {
+  border-left-color: var(--dark-border);
+}
+
+/* Modal backgrounds */
+html.dark .bg-black {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Table headers */
+html.dark .bg-gray-50 {
+  background-color: var(--dark-bg-secondary);
+}
+
+/* Scrollbar for webkit browsers */
+html.dark ::-webkit-scrollbar {
+  width: 12px;
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: var(--dark-bg-secondary);
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: var(--dark-bg-tertiary);
+  border-radius: 6px;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--dark-hover-bg);
+}
+
+/* Header elements */
+html.dark header {
+  background-color: var(--dark-header-bg);
+}
+
+/* Additional elements that need dark mode styling */
+html.dark .bg-gradient-custom {
+  background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 50%, #252525 100%);
+}

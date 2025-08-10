@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+scikit-learn
+pandas
+numpy
+joblib
+pydantic
+requests  # optional for Ollama HTTP API integration

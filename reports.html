@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#1e40af',
+                        accent: '#3b82f6',
+                        danger: '#ef4444',
+                        warning: '#f59e0b',
+                        success: '#10b981'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        .sidebar.collapsed {
+            width: 80px;
+            overflow: hidden;
+        }
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+        .sidebar.collapsed .logo-text {
+            display: none;
+        }
+        .sidebar.collapsed .user-name {
+            display: none;
+        }
+        .sidebar.collapsed .user-role {
+            display: none;
+        }
+        .sidebar.collapsed .menu-title {
+            display: none;
+        }
+        .main-content {
+            transition: all 0.3s ease;
+            margin-left: 256px;
+        }
+        .sidebar.collapsed ~ .main-content {
+            margin-left: 80px;
+        }
+        @media (max-width: 768px) {
+            .sidebar.collapsed ~ .main-content {
+                margin-left: 0;
+            }
+        }
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                z-index: 1000;
+                height: 100vh;
+            }
+            .sidebar.collapsed {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-white w-64 border-r border-gray-200 flex flex-col">
+            <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-cogs text-primary text-xl"></i>
+                    <h1 class="text-xl font-bold text-primary ml-2 sidebar-text logo-text">MaintainXpert</h1>
+                </div>
+                <button class="text-gray-500 hover:text-gray-700 sidebar-toggle hidden md:block">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto">
+                <nav class="p-4">
+                    <div class="mb-6">
+                        <p class="text-xs uppercase text-gray-500 font-semibold mb-2 menu-title">Main Menu</p>
+                        <ul>
+                            <li class="mb-1">
+                                <a href="supervisor.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-tachometer-alt mr-3"></i>
+                                    <span class="sidebar-text">Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="machineScanner.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-qrcode mr-3"></i>
+                                    <span class="sidebar-text">Machine Scanner</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="maintenance.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-tools mr-3"></i>
+                                    <span class="sidebar-text">Maintenance</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="Snotifications.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg relative">
+                                    <i class="fas fa-bell mr-3"></i>
+                                    <span class="sidebar-text">Notifications</span>
+                                    <span class="notification-badge">5</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="reports.html" class="flex items-center p-2 text-primary bg-blue-50 rounded-lg">
+                                    <i class="fas fa-chart-bar mr-3"></i>
+                                    <span class="sidebar-text">Reports</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="PredictiveAlerts.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                                    <span class="sidebar-text">Predictive Alerts</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="SensorSimulation.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-microchip mr-3"></i>
+                                    <span class="sidebar-text">Sensor Simulation</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="OverdueTasks.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-clock mr-3"></i>
+                                    <span class="sidebar-text">Overdue Tasks</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="AInotify.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-robot mr-3"></i>
+                                    <span class="sidebar-text">AI Notify</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mb-6">
+                        <p class="text-xs uppercase text-gray-500 font-semibold mb-2 menu-title">Administration</p>
+                        <ul>
+                            <li class="mb-1">
+                                <a href="#users" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-users mr-3"></i>
+                                    <span class="sidebar-text">Users</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="Ssettings.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-cog mr-3"></i>
+                                    <span class="sidebar-text">Settings</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+            <div class="p-4 border-t border-gray-200">
+                <div class="flex items-center justify-between w-full">
+                    <!-- Profile + Name -->
+                    <div class="flex items-center space-x-2">
+                        <img src="sanjay.jpeg" alt="User" class="w-8 h-8 rounded-full">
+                        <div class="leading-tight">
+                            <p class="text-sm font-medium user-name">Sanjay Atmakuri</p>
+                            <p class="text-xs text-gray-500 user-role">Supervisor</p>
+                        </div>
+                    </div>
+                    <!-- Logout Icon -->
+                    <button onclick="logout()" title="Logout" class="sidebar-text">
+                        <i class="fas fa-sign-out-alt text-gray-500 hover:text-red-600 text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto main-content">
+        <!-- Header -->
+        <header class="bg-primary text-white shadow-md flex justify-between items-center">
+            <button class="text-white md:hidden ml-4" id="mobileSidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-chart-bar text-2xl"></i>
+                    <h1 class="text-2xl font-bold">Reports</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="bg-secondary hover:bg-accent px-4 py-2 rounded-lg flex items-center">
+                        <i class="fas fa-download mr-2"></i> Export
+                    </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto px-4 py-6">
+            <!-- Filters Section -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Search Machines</label>
+                        <div class="relative">
+                            <input type="text" placeholder="Search by machine ID, name, or supplier..." 
+                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Filter by Status</label>
+                        <select class="w-full md:w-40 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="maintenance">Maintenance</option>
+                            <option value="retired">Retired</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                        <div class="flex space-x-2">
+                            <input type="date" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent">
+                            <span class="flex items-center">to</span>
+                            <input type="date" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
+                    <div class="p-3 rounded-lg bg-primary bg-opacity-10 text-primary mr-4">
+                        <i class="fas fa-industry text-2xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Total Machines</p>
+                        <h3 class="text-2xl font-bold">142</h3>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
+                    <div class="p-3 rounded-lg bg-success bg-opacity-10 text-success mr-4">
+                        <i class="fas fa-check-circle text-2xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Operational</p>
+                        <h3 class="text-2xl font-bold">118</h3>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
+                    <div class="p-3 rounded-lg bg-warning bg-opacity-10 text-warning mr-4">
+                        <i class="fas fa-tools text-2xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Under Maintenance</p>
+                        <h3 class="text-2xl font-bold">19</h3>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
+                    <div class="p-3 rounded-lg bg-danger bg-opacity-10 text-danger mr-4">
+                        <i class="fas fa-times-circle text-2xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Retired</p>
+                        <h3 class="text-2xl font-bold">5</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Machine Reports Table -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                    <h2 class="text-lg font-semibold text-gray-800">Machine History Records</h2>
+                    <div class="flex space-x-2">
+                        <button class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">
+                            <i class="fas fa-sync-alt mr-1"></i> Refresh
+                        </button>
+                        <button class="px-3 py-1 bg-primary hover:bg-secondary text-white rounded-lg text-sm">
+                            <i class="fas fa-plus mr-1"></i> Add Record
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Machine ID</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Supplier</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purchase Date</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Repairs</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <!-- Row 1 -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10 bg-primary bg-opacity-10 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-robot text-primary"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">MCH-00142</div>
+                                            <div class="text-sm text-gray-500">Serial: SN-2023-142</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">CNC Lathe</div>
+                                    <div class="text-sm text-gray-500">Model: LX-3000</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">Precision Tools Inc.</div>
+                                    <div class="text-sm text-gray-500">Contact: John Smith</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">15 Mar 2023</div>
+                                    <div class="text-sm text-gray-500">Warranty: 2 years</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <span class="mr-2 text-sm font-medium">2</span>
+                                        <div class="w-20 bg-gray-200 rounded-full h-2">
+                                            <div class="bg-warning h-2 rounded-full" style="width: 40%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-success bg-opacity-10 text-success font-medium">Operational</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-accent hover:text-secondary mr-3">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="text-primary hover:text-secondary mr-3">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-danger hover:text-red-700">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Row 2 -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10 bg-primary bg-opacity-10 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-robot text-primary"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">MCH-00141</div>
+                                            <div class="text-sm text-gray-500">Serial: SN-2022-987</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">3D Printer</div>
+                                    <div class="text-sm text-gray-500">Model: ProMaker X5</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">TechFab Solutions</div>
+                                    <div class="text-sm text-gray-500">Contact: Sarah Lee</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">22 Nov 2022</div>
+                                    <div class="text-sm text-gray-500">Warranty: 1 year</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <span class="mr-2 text-sm font-medium">5</span>
+                                        <div class="w-20 bg-gray-200 rounded-full h-2">
+                                            <div class="bg-danger h-2 rounded-full" style="width: 100%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-warning bg-opacity-10 text-warning font-medium">Maintenance</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-accent hover:text-secondary mr-3">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="text-primary hover:text-secondary mr-3">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-danger hover:text-red-700">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Row 3 -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10 bg-primary bg-opacity-10 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-robot text-primary"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">MCH-00140</div>
+                                            <div class="text-sm text-gray-500">Serial: SN-2021-456</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">Laser Cutter</div>
+                                    <div class="text-sm text-gray-500">Model: LC-2000</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">BeamTech Ltd.</div>
+                                    <div class="text-sm text-gray-500">Contact: Michael Chen</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">05 Aug 2021</div>
+                                    <div class="text-sm text-gray-500">Warranty: Expired</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <span class="mr-2 text-sm font-medium">3</span>
+                                        <div class="w-20 bg-gray-200 rounded-full h-2">
+                                            <div class="bg-warning h-2 rounded-full" style="width: 60%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-success bg-opacity-10 text-success font-medium">Operational</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-accent hover:text-secondary mr-3">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="text-primary hover:text-secondary mr-3">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-danger hover:text-red-700">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Row 4 -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10 bg-primary bg-opacity-10 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-robot text-primary"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">MCH-00139</div>
+                                            <div class="text-sm text-gray-500">Serial: SN-2020-321</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">Milling Machine</div>
+                                    <div class="text-sm text-gray-500">Model: VM-800</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">Industrial Machining Co.</div>
+                                    <div class="text-sm text-gray-500">Contact: Robert Johnson</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">12 Feb 2020</div>
+                                    <div class="text-sm text-gray-500">Warranty: Expired</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <span class="mr-2 text-sm font-medium">8</span>
+                                        <div class="w-20 bg-gray-200 rounded-full h-2">
+                                            <div class="bg-danger h-2 rounded-full" style="width: 100%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-danger bg-opacity-10 text-danger font-medium">Retired</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-accent hover:text-secondary mr-3">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="text-primary hover:text-secondary mr-3">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-danger hover:text-red-700">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Row 5 -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10 bg-primary bg-opacity-10 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-robot text-primary"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">MCH-00138</div>
+                                            <div class="text-sm text-gray-500">Serial: SN-2023-076</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">Plasma Cutter</div>
+                                    <div class="text-sm text-gray-500">Model: PC-5000</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">Cutting Edge Tech</div>
+                                    <div class="text-sm text-gray-500">Contact: Emily Wilson</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">30 Apr 2023</div>
+                                    <div class="text-sm text-gray-500">Warranty: 3 years</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <span class="mr-2 text-sm font-medium">0</span>
+                                        <div class="w-20 bg-gray-200 rounded-full h-2">
+                                            <div class="bg-success h-2 rounded-full" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-success bg-opacity-10 text-success font-medium">Operational</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-accent hover:text-secondary mr-3">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="text-primary hover:text-secondary mr-3">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-danger hover:text-red-700">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
+                    <div class="flex-1 flex justify-between sm:hidden">
+                        <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Previous</button>
+                        <button class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Next</button>
+                    </div>
+                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700">
+                                Showing <span class="font-medium">1</span> to <span class="font-medium">5</span> of <span class="font-medium">142</span> results
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                <button class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">Previous</span>
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button aria-current="page" class="z-10 bg-primary border-primary text-white relative inline-flex items-center px-4 py-2 border text-sm font-medium">1</button>
+                                <button class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">2</button>
+                                <button class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">3</button>
+                                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">...</span>
+                                <button class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">8</button>
+                                <button class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">Next</span>
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Machine Details Modal (Hidden by default) -->
+            <div id="machineModal" class="fixed inset-0 overflow-y-auto hidden z-50">
+                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                        <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                    </div>
+                    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+                        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                            <div class="sm:flex sm:items-start">
+                                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-primary bg-opacity-10 sm:mx-0 sm:h-10 sm:w-10">
+                                    <i class="fas fa-robot text-primary"></i>
+                                </div>
+                                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                        Machine Details - MCH-00142
+                                    </h3>
+                                    <div class="mt-2">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                                            <div>
+                                                <h4 class="font-medium text-gray-700 mb-2">Basic Information</h4>
+                                                <div class="space-y-2">
+                                                    <div class="flex justify-between border-b pb-1">
+                                                        <span class="text-gray-500">Name:</span>
+                                                        <span class="font-medium">CNC Lathe</span>
+                                                    </div>
+                                                    <div class="flex justify-between border-b pb-1">
+                                                        <span class="text-gray-500">Model:</span>
+                                                        <span class="font-medium">LX-3000</span>
+                                                    </div>
+                                                    <div class="flex justify-between border-b pb-1">
+                                                        <span class="text-gray-500">Serial Number:</span>
+                                                        <span class="font-medium">SN-2023-142</span>
+                                                    </div>
+                                                    <div class="flex justify-between border-b pb-1">
+                                                        <span class="text-gray-500">Manufacturer:</span>
+                                                        <span class="font-medium">Precision Tools Inc.</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-medium text-gray-700 mb-2">Purchase Details</h4>
+                                                <div class="space-y-2">
+                                                    <div class="flex justify-between border-b pb-1">
+                                                        <span class="text-gray-500">Purchase Date:</span>
+                                                        <span class="font-medium">15 Mar 2023</span>
+                                                    </div>
+                                                    <div class="flex justify-between border-b pb-1">
+                                                        <span class="text-gray-500">Price:</span>
+                                                        <span class="font-medium">$28,500.00</span>
+                                                    </div>
+                                                    <div class="flex justify-between border-b pb-1">
+                                                        <span class="text-gray-500">Warranty:</span>
+                                                        <span class="font-medium">2 years (until 15 Mar 2025)</span>
+                                                    </div>
+                                                    <div class="flex justify-between border-b pb-1">
+                                                        <span class="text-gray-500">Supplier Contact:</span>
+                                                        <span class="font-medium">John Smith (john@precisiontools.com)</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-6">
+                                            <h4 class="font-medium text-gray-700 mb-2">Maintenance History</h4>
+                                            <div class="bg-gray-50 rounded-lg p-4">
+                                                <div class="space-y-4">
+                                                    <div class="border-l-4 border-warning pl-4 py-2">
+                                                        <div class="flex justify-between">
+                                                            <span class="font-medium">Repair #2 - Spindle Motor Replacement</span>
+                                                            <span class="text-sm text-gray-500">10 Jun 2023</span>
+                                                        </div>
+                                                        <p class="text-sm text-gray-600 mt-1">Replaced the spindle motor due to overheating issues. Cost: $1,200.00</p>
+                                                        <div class="mt-1">
+                                                            <span class="inline-block bg-warning bg-opacity-10 text-warning text-xs px-2 py-1 rounded">Completed</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="border-l-4 border-success pl-4 py-2">
+                                                        <div class="flex justify-between">
+                                                            <span class="font-medium">Repair #1 - Software Update</span>
+                                                            <span class="text-sm text-gray-500">05 May 2023</span>
+                                                        </div>
+                                                        <p class="text-sm text-gray-600 mt-1">Updated control software to version 2.3.1 to fix known bugs. Covered under warranty.</p>
+                                                        <div class="mt-1">
+                                                            <span class="inline-block bg-success bg-opacity-10 text-success text-xs px-2 py-1 rounded">Completed</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-6">
+                                            <h4 class="font-medium text-gray-700 mb-2">Performance Metrics</h4>
+                                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <div class="bg-gray-50 rounded-lg p-4">
+                                                    <div class="text-sm text-gray-500">Uptime</div>
+                                                    <div class="text-2xl font-bold mt-1">98.7%</div>
+                                                    <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                                        <div class="bg-success h-2 rounded-full" style="width: 98.7%"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="bg-gray-50 rounded-lg p-4">
+                                                    <div class="text-sm text-gray-500">Avg. Output</div>
+                                                    <div class="text-2xl font-bold mt-1">92/hr</div>
+                                                    <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                                        <div class="bg-primary h-2 rounded-full" style="width: 92%"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="bg-gray-50 rounded-lg p-4">
+                                                    <div class="text-sm text-gray-500">Maintenance Cost</div>
+                                                    <div class="text-2xl font-bold mt-1">$1,200</div>
+                                                    <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                                        <div class="bg-warning h-2 rounded-full" style="width: 60%"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                            <button type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent sm:ml-3 sm:w-auto sm:text-sm">
+                                Print Report
+                            </button>
+                            <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm close-modal">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        
+        <!-- <footer class="bg-white border-t border-gray-200 py-4">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-sm text-gray-500 mb-2 md:mb-0">
+                        © 2023 Machine Management System. All rights reserved.
+                    </div>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-500 hover:text-primary">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-primary">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-primary">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-primary">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>-->
+        </div>
+    </div>
+
+    <script>
+        // Sidebar toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
+            const mainContent = document.querySelector('.main-content');
+
+            // Desktop toggle
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    
+                    // Change the icon based on state
+                    const icon = sidebarToggle.querySelector('i');
+                    if (sidebar.classList.contains('collapsed')) {
+                        icon.classList.remove('fa-chevron-left');
+                        icon.classList.add('fa-chevron-right');
+                    } else {
+                        icon.classList.remove('fa-chevron-right');
+                        icon.classList.add('fa-chevron-left');
+                    }
+                });
+            }
+
+            // Mobile toggle
+            if (mobileSidebarToggle) {
+                mobileSidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    // On mobile, we want to push content when sidebar is open
+                    if (window.innerWidth <= 768) {
+                        if (sidebar.classList.contains('collapsed')) {
+                            mainContent.style.marginLeft = '0';
+                        } else {
+                            mainContent.style.marginLeft = '256px';
+                        }
+                    }
+                });
+            }
+
+            // Logout function
+            window.logout = function() {
+                window.location.href = 'index.html';
+            };
+        });
+
+        // Toggle modal visibility
+        document.querySelectorAll('[data-modal-toggle]').forEach(button => {
+            button.addEventListener('click', () => {
+                document.getElementById('machineModal').classList.toggle('hidden');
+            });
+        });
+
+        // Close modal
+        document.querySelectorAll('.close-modal').forEach(button => {
+            button.addEventListener('click', () => {
+                document.getElementById('machineModal').classList.add('hidden');
+            });
+        });
+
+        // Simulate loading for demo purposes
+        setTimeout(() => {
+            document.querySelectorAll('.animate-pulse').forEach(el => {
+                el.classList.remove('animate-pulse');
+            });
+        }, 1500);
+        
+        // Theme toggle functionality with localStorage persistence
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else if (theme === 'light') {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                // System preference
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                localStorage.setItem('theme', 'system');
+            }
+        }
+        
+        // Apply saved theme on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'system';
+            setTheme(savedTheme);
+        });
+    </script>
+</body>
+</html>

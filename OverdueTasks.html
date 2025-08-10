@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overdue Tasks - MaintainXpert</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#1e40af',
+                        accent: '#3b82f6',
+                        danger: '#ef4444',
+                        warning: '#f59e0b',
+                        success: '#10b981'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        .sidebar.collapsed {
+            width: 80px;
+            overflow: hidden;
+        }
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+        .sidebar.collapsed .logo-text {
+            display: none;
+        }
+        .sidebar.collapsed .user-name {
+            display: none;
+        }
+        .sidebar.collapsed .user-role {
+            display: none;
+        }
+        .sidebar.collapsed .menu-title {
+            display: none;
+        }
+        .main-content {
+            transition: all 0.3s ease;
+            margin-left: 256px;
+        }
+        .sidebar.collapsed ~ .main-content {
+            margin-left: 80px;
+        }
+        @media (max-width: 768px) {
+            .sidebar.collapsed ~ .main-content {
+                margin-left: 0;
+            }
+        }
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                z-index: 1000;
+                height: 100vh;
+            }
+            .sidebar.collapsed {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+        .task-card {
+            transition: all 0.3s ease;
+        }
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e5e7eb;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .priority-high {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+        }
+        .priority-medium {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid #f59e0b;
+        }
+        .priority-low {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-white w-64 border-r border-gray-200 flex flex-col">
+            <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-cogs text-primary text-xl"></i>
+                    <h1 class="text-xl font-bold text-primary ml-2 sidebar-text logo-text">MaintainXpert</h1>
+                </div>
+                <button class="text-gray-500 hover:text-gray-700 sidebar-toggle hidden md:block">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto">
+                <nav class="p-4">
+                    <div class="mb-6">
+                        <p class="text-xs uppercase text-gray-500 font-semibold mb-2 menu-title">Main Menu</p>
+                        <ul>
+                            <li class="mb-1">
+                                <a href="supervisor.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-tachometer-alt mr-3"></i>
+                                    <span class="sidebar-text">Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="machineScanner.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-qrcode mr-3"></i>
+                                    <span class="sidebar-text">Machine Scanner</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="maintenance.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-tools mr-3"></i>
+                                    <span class="sidebar-text">Maintenance</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="Snotifications.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg relative">
+                                    <i class="fas fa-bell mr-3"></i>
+                                    <span class="sidebar-text">Notifications</span>
+                                    <span class="notification-badge">5</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="reports.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-chart-bar mr-3"></i>
+                                    <span class="sidebar-text">Reports</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="PredictiveAlerts.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                                    <span class="sidebar-text">Predictive Alerts</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="SensorSimulation.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-microchip mr-3"></i>
+                                    <span class="sidebar-text">Sensor Simulation</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="OverdueTasks.html" class="flex items-center p-2 text-primary bg-blue-50 rounded-lg">
+                                    <i class="fas fa-clock mr-3"></i>
+                                    <span class="sidebar-text">Overdue Tasks</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="AInotify.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-robot mr-3"></i>
+                                    <span class="sidebar-text">AI Notify</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mb-6">
+                        <p class="text-xs uppercase text-gray-500 font-semibold mb-2 menu-title">Administration</p>
+                        <ul>
+                            <li class="mb-1">
+                                <a href="#users" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-users mr-3"></i>
+                                    <span class="sidebar-text">Users</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="Ssettings.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-cog mr-3"></i>
+                                    <span class="sidebar-text">Settings</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+            <div class="p-4 border-t border-gray-200">
+                <div class="flex items-center justify-between w-full">
+                    <!-- Profile + Name -->
+                    <div class="flex items-center space-x-2">
+                        <img src="sanjay.jpeg" alt="User" class="w-8 h-8 rounded-full">
+                        <div class="leading-tight">
+                            <p class="text-sm font-medium user-name">Sanjay Atmakuri</p>
+                            <p class="text-xs text-gray-500 user-role">Supervisor</p>
+                        </div>
+                    </div>
+                    <!-- Logout Icon -->
+                    <button onclick="logout()" title="Logout" class="sidebar-text">
+                        <i class="fas fa-sign-out-alt text-gray-500 hover:text-red-600 text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto main-content">
+            <!-- Header -->
+            <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+                <button class="text-gray-600 md:hidden" id="mobileSidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h2 class="text-lg font-semibold text-gray-800">Overdue Tasks</h2>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <a href="Snotifications.html" class="text-gray-600 hover:text-gray-800">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">5</span>
+                        </a>
+                    </div>
+                    <div class="flex items-center">
+                        <img src="sanjay.jpeg" alt="User" class="w-8 h-8 rounded-full mr-2">
+                        <span class="hidden md:inline">Sanjay Atmakuri</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="p-4">
+                <!-- Task Summary -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-red-100 text-danger mr-4">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Critical Overdue</p>
+                                <p class="text-2xl font-bold">8</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-yellow-100 text-warning mr-4">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">High Priority</p>
+                                <p class="text-2xl font-bold">12</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-blue-100 text-primary mr-4">
+                                <i class="fas fa-calendar-day"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Due Today</p>
+                                <p class="text-2xl font-bold">5</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-green-100 text-success mr-4">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Completed Today</p>
+                                <p class="text-2xl font-bold">7</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task Filters -->
+                <div class="bg-white p-4 rounded-lg shadow mb-6">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex items-center space-x-2">
+                            <h3 class="text-lg font-semibold">Task Filters</h3>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="px-3 py-1 bg-primary text-white rounded-md hover:bg-secondary">All Tasks</button>
+                            <button class="px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100">Critical</button>
+                            <button class="px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100">High</button>
+                            <button class="px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100">Medium</button>
+                            <button class="px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100">Low</button>
+                        </div>
+                        <div class="relative">
+                            <input type="text" placeholder="Search tasks..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                            <i class="fas fa-search absolute right-3 top-2.5 text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Critical Overdue Tasks -->
+                <div class="bg-white p-4 rounded-lg shadow mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold">Critical Overdue Tasks</h3>
+                        <div class="flex items-center">
+                            <span class="text-sm text-gray-500 mr-2">Sort by:</span>
+                            <select class="border rounded-md px-2 py-1 text-sm focus:ring-primary focus:border-primary">
+                                <option>Days Overdue</option>
+                                <option>Priority</option>
+                                <option>Machine</option>
+                                <option>Task Type</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="task-card p-4 rounded-lg priority-high">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between">
+                                <div class="mb-2 md:mb-0">
+                                    <div class="flex items-center">
+                                        <h4 class="font-medium">Hydraulic Press Maintenance</h4>
+                                        <span class="ml-2 text-xs px-2 py-0.5 bg-red-100 text-danger rounded-full">Critical</span>
+                                        <span class="ml-2 text-xs px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full">Machine #12</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mt-1">Complete hydraulic fluid replacement and seal inspection</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-sm font-medium text-danger">15 days overdue</span>
+                                    <button class="px-3 py-1 bg-primary text-white rounded hover:bg-secondary text-sm">Assign</button>
+                                    <button class="px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-100 text-sm">Details</button>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                    <span>Assigned to: Unassigned</span>
+                                    <span>Due: 15 Jun 2023</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill bg-danger" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="task-card p-4 rounded-lg priority-high">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between">
+                                <div class="mb-2 md:mb-0">
+                                    <div class="flex items-center">
+                                        <h4 class="font-medium">CNC Machine Calibration</h4>
+                                        <span class="ml-2 text-xs px-2 py-0.5 bg-red-100 text-danger rounded-full">Critical</span>
+                                        <span class="ml-2 text-xs px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full">Machine #5</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mt-1">Precision calibration and alignment of CNC machine axes</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-sm font-medium text-danger">8 days overdue</span>
+                                    <button class="px-3 py-1 bg-primary text-white rounded hover:bg-secondary text-sm">Assign</button>
+                                    <button class="px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-100 text-sm">Details</button>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                    <span>Assigned to: Unassigned</span>
+                                    <span>Due: 22 Jun 2023</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill bg-danger" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="task-card p-4 rounded-lg priority-high">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between">
+                                <div class="mb-2 md:mb-0">
+                                    <div class="flex items-center">
+                                        <h4 class="font-medium">Conveyor Belt Replacement</h4>
+                                        <span class="ml-2 text-xs px-2 py-0.5 bg-red-100 text-danger rounded-full">Critical</span>
+                                        <span class="ml-2 text-xs px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full">Machine #3</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mt-1">Replace worn conveyor belt and adjust tension</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-sm font-medium text-danger">5 days overdue</span>
+                                    <button class="px-3 py-1 bg-primary text-white rounded hover:bg-secondary text-sm">Assign</button>
+                                    <button class="px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-100 text-sm">Details</button>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                    <span>Assigned to: Unassigned</span>
+                                    <span>Due: 25 Jun 2023</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill bg-danger" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- High Priority Overdue Tasks -->
+                <div class="bg-white p-4 rounded-lg shadow mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold">High Priority Overdue Tasks</h3>
+                        <button class="text-primary text-sm font-medium">View All</button>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="task-card p-4 rounded-lg priority-medium">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between">
+                                <div class="mb-2 md:mb-0">
+                                    <div class="flex items-center">
+                                        <h4 class="font-medium">Electrical System Inspection</h4>
+                                        <span class="ml-2 text-xs px-2 py-0.5 bg-yellow-100 text-warning rounded-full">High</span>
+                                        <span class="ml-2 text-xs px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full">Machine #8</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mt-1">Inspect and test all electrical connections and safety systems</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-sm font-medium text-warning">3 days overdue</span>
+                                    <button class="px-3 py-1 bg-primary text-white rounded hover:bg-secondary text-sm">Assign</button>
+                                    <button class="px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-100 text-sm">Details</button>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                    <span>Assigned to: Unassigned</span>
+                                    <span>Due: 27 Jun 2023</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill bg-warning" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="task-card p-4 rounded-lg priority-medium">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between">
+                                <div class="mb-2 md:mb-0">
+                                    <div class="flex items-center">
+                                        <h4 class="font-medium">Cooling System Maintenance</h4>
+                                        <span class="ml-2 text-xs px-2 py-0.5 bg-yellow-100 text-warning rounded-full">High</span>
+                                        <span class="ml-2 text-xs px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full">Machine #15</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mt-1">Clean cooling system and replace coolant fluid</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-sm font-medium text-warning">2 days overdue</span>
+                                    <button class="px-3 py-1 bg-primary text-white rounded hover:bg-secondary text-sm">Assign</button>
+                                    <button class="px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-100 text-sm">Details</button>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                    <span>Assigned to: Unassigned</span>
+                                    <span>Due: 28 Jun 2023</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill bg-warning" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Due Today Tasks -->
+                <div class="bg-white p-4 rounded-lg shadow mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold">Due Today</h3>
+                        <button class="text-primary text-sm font-medium">View All</button>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="task-card p-4 rounded-lg priority-low">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between">
+                                <div class="mb-2 md:mb-0">
+                                    <div class="flex items-center">
+                                        <h4 class="font-medium">Lubrication Check</h4>
+                                        <span class="ml-2 text-xs px-2 py-0.5 bg-blue-100 text-primary rounded-full">Medium</span>
+                                        <span class="ml-2 text-xs px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full">Machine #7</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mt-1">Check and refill all lubrication points</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-sm font-medium text-primary">Due today</span>
+                                    <button class="px-3 py-1 bg-primary text-white rounded hover:bg-secondary text-sm">Assign</button>
+                                    <button class="px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-100 text-sm">Details</button>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                    <span>Assigned to: Unassigned</span>
+                                    <span>Due: Today</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill bg-primary" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="task-card p-4 rounded-lg priority-low">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between">
+                                <div class="mb-2 md:mb-0">
+                                    <div class="flex items-center">
+                                        <h4 class="font-medium">Safety Guard Inspection</h4>
+                                        <span class="ml-2 text-xs px-2 py-0.5 bg-blue-100 text-primary rounded-full">Medium</span>
+                                        <span class="ml-2 text-xs px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full">Machine #10</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mt-1">Inspect and test all safety guards and emergency stops</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-sm font-medium text-primary">Due today</span>
+                                    <button class="px-3 py-1 bg-primary text-white rounded hover:bg-secondary text-sm">Assign</button>
+                                    <button class="px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-100 text-sm">Details</button>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                    <span>Assigned to: Unassigned</span>
+                                    <span>Due: Today</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill bg-primary" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overdue Tasks Analytics -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold mb-4">Overdue Tasks by Department</h3>
+                        <div class="chart-container">
+                            <canvas id="departmentChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold mb-4">Overdue Tasks by Priority</h3>
+                        <div class="chart-container">
+                            <canvas id="priorityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulk Actions -->
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold">Bulk Actions</h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-4 border rounded-lg">
+                            <h4 class="font-medium mb-2">Reassign Tasks</h4>
+                            <p class="text-sm text-gray-600 mb-3">Reassign multiple tasks to a specific technician</p>
+                            <button class="w-full px-3 py-2 bg-primary text-white rounded-md hover:bg-secondary">Reassign Selected</button>
+                        </div>
+                        <div class="p-4 border rounded-lg">
+                            <h4 class="font-medium mb-2">Reschedule Tasks</h4>
+                            <p class="text-sm text-gray-600 mb-3">Change due dates for multiple tasks at once</p>
+                            <button class="w-full px-3 py-2 bg-primary text-white rounded-md hover:bg-secondary">Reschedule Selected</button>
+                        </div>
+                        <div class="p-4 border rounded-lg">
+                            <h4 class="font-medium mb-2">Export Tasks</h4>
+                            <p class="text-sm text-gray-600 mb-3">Export task list to CSV or PDF format</p>
+                            <button class="w-full px-3 py-2 bg-primary text-white rounded-md hover:bg-secondary">Export Tasks</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Assign Task Modal -->
+    <div id="assignTaskModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-4">
+            <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="text-lg font-semibold">Assign Task</h3>
+                <button class="text-gray-500 hover:text-gray-700" onclick="toggleModal('assignTaskModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-4">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Task</label>
+                    <p class="font-medium">Hydraulic Press Maintenance</p>
+                    <p class="text-sm text-gray-600">Machine #12</p>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Assign To</label>
+                    <select class="w-full border rounded-md px-3 py-2 focus:ring-primary focus:border-primary">
+                        <option>Select Technician</option>
+                        <option>John Smith</option>
+                        <option>Maria Garcia</option>
+                        <option>David Chen</option>
+                        <option>Sarah Johnson</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                    <select class="w-full border rounded-md px-3 py-2 focus:ring-primary focus:border-primary">
+                        <option>Critical</option>
+                        <option>High</option>
+                        <option>Medium</option>
+                        <option>Low</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+                    <input type="date" class="w-full border rounded-md px-3 py-2 focus:ring-primary focus:border-primary">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                    <textarea class="w-full border rounded-md px-3 py-2 focus:ring-primary focus:border-primary" rows="3" placeholder="Add any additional instructions..."></textarea>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300" onclick="toggleModal('assignTaskModal')">Cancel</button>
+                    <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary">Assign Task</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sidebar toggle functionality
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
+            const mainContent = document.querySelector('.main-content');
+            
+            // Desktop toggle
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    
+                    // Change the icon based on state
+                    const icon = sidebarToggle.querySelector('i');
+                    if (sidebar.classList.contains('collapsed')) {
+                        icon.classList.remove('fa-chevron-left');
+                        icon.classList.add('fa-chevron-right');
+                    } else {
+                        icon.classList.remove('fa-chevron-right');
+                        icon.classList.add('fa-chevron-left');
+                    }
+                });
+            }
+            
+            // Mobile toggle
+            if (mobileSidebarToggle) {
+                mobileSidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    // On mobile, we want to push content when sidebar is open
+                    if (window.innerWidth <= 768) {
+                        if (sidebar.classList.contains('collapsed')) {
+                            mainContent.style.marginLeft = '0';
+                        } else {
+                            mainContent.style.marginLeft = '256px';
+                        }
+                    }
+                });
+            }
+            
+            // Initialize Charts
+            const departmentCtx = document.getElementById('departmentChart').getContext('2d');
+            const departmentChart = new Chart(departmentCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Production', 'Assembly', 'Packaging', 'Quality Control', 'Shipping'],
+                    datasets: [{
+                        label: 'Overdue Tasks',
+                        data: [8, 5, 3, 2, 2],
+                        backgroundColor: '#3b82f6',
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            const priorityCtx = document.getElementById('priorityChart').getContext('2d');
+            const priorityChart = new Chart(priorityCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Critical', 'High', 'Medium', 'Low'],
+                    datasets: [{
+                        data: [8, 12, 5, 3],
+                        backgroundColor: [
+                            '#ef4444',
+                            '#f59e0b',
+                            '#3b82f6',
+                            '#10b981'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+            
+            // Modal functionality
+            window.toggleModal = function(modalId) {
+                const modal = document.getElementById(modalId);
+                if (modal.classList.contains('hidden')) {
+                    modal.classList.remove('hidden');
+                } else {
+                    modal.classList.add('hidden');
+                }
+            };
+            
+            // Assign buttons event listeners
+            const assignButtons = document.querySelectorAll('button:not(.sidebar-toggle):not(#mobileSidebarToggle)');
+            assignButtons.forEach(button => {
+                if (button.textContent.trim() === 'Assign') {
+                    button.addEventListener('click', function() {
+                        toggleModal('assignTaskModal');
+                    });
+                }
+            });
+            
+            // Logout function
+            window.logout = function() {
+                window.location.href = 'index.html';
+            };
+            
+            // Theme toggle functionality with localStorage persistence
+            function setTheme(theme) {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                } else if (theme === 'light') {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    // System preference
+                    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                    localStorage.setItem('theme', 'system');
+                }
+            }
+            
+            // Apply saved theme on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                const savedTheme = localStorage.getItem('theme') || 'system';
+                setTheme(savedTheme);
+            });
+        });
+    </script>
+</body>
+</html>

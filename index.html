@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MaintainXpert Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+        
+        .bg-gradient-custom {
+            background: linear-gradient(135deg, #4f46e5 0%, #1e40af 50%, #2563eb 100%);
+        }
+        
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+            border-color: #6366f1;
+        }
+        
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        
+        @keyframes shake {
+            10%, 90% { transform: translateX(-1px); }
+            20%, 80% { transform: translateX(2px); }
+            30%, 50%, 70% { transform: translateX(-4px); }
+            40%, 60% { transform: translateX(4px); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-white rounded-xl shadow-2xl overflow-hidden fade-in">
+        <div class="bg-gradient-custom text-white p-8 text-center">
+            <div class="flex justify-center mb-4">
+                <div class="bg-white/20 p-4 rounded-full">
+                   <!--<i class="fas fa-user-shield text-3xl"></i>-->
+                    <i class="fas fa-cogs text-3xl mr-2"></i>
+                </div>
+            </div>
+            <h1 class="text-2xl font-bold mb-2">MaintainXpert</h1>
+            <p class="opacity-90">Predict. Prevent. Perform.</p>
+            <h2 class="text-2xl font-bold mb-2">Login</h2>
+        </div>
+        
+        <div class="p-8">
+            <div class="mb-6">
+                <div class="flex border-b border-gray-200">
+                    <button id="supervisor-tab" class="flex-1 py-2 px-4 font-medium text-center text-indigo-600 border-b-2 border-indigo-600">Supervisor</button>
+                    <button id="manager-tab" class="flex-1 py-2 px-4 font-medium text-center text-gray-500 hover:text-gray-700">Manager</button>
+                </div>
+            </div>
+            
+            <form id="login-form" class="space-y-6">
+                <div id="role-indicator" class="text-sm text-indigo-600 font-medium delay-1 fade-in">
+                    <i class="fas fa-user-tie mr-2"></i> Supervisor Login
+                </div>
+                
+                <div class="space-y-4 delay-2 fade-in">
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-gray-400"></i>
+                            </div>
+                            <input type="text" id="username" name="username" required 
+                                   class="pl-10 w-full rounded-lg border-gray-300 input-focus py-3 px-4 border focus:outline-none transition"
+                                   placeholder="Enter your username">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-lock text-gray-400"></i>
+                            </div>
+                            <input type="password" id="password" name="password" required 
+                                   class="pl-10 w-full rounded-lg border-gray-300 input-focus py-3 px-4 border focus:outline-none transition"
+                                   placeholder="Enter your password">
+                            <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <i class="fas fa-eye text-gray-400 hover:text-gray-600"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between delay-3 fade-in">
+                    <div class="flex items-center">
+                        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                        <label for="remember-me" class="ml-2 block text-sm text-gray-700">Remember me</label>
+                    </div>
+                    <div class="text-sm">
+                        <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+                    </div>
+                </div>
+                
+                <div class="delay-3 fade-in">
+                    <button type="submit" id="login-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition duration-300 flex items-center justify-center">
+                        <span id="btn-text">Login</span>
+                        <i id="btn-spinner" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+                    </button>
+                </div>
+                
+                <div id="error-message" class="text-red-500 text-sm text-center hidden delay-3 fade-in">
+                    <i class="fas fa-exclamation-circle mr-1"></i> Invalid username or password
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Dummy credentials
+        const credentials = {
+            supervisor: {
+                username: "admin@gmail.com",
+                password: "admin123"
+            },
+            manager: {
+                username: "manager@gmail.com",
+                password: "manager123"
+            }
+        };
+        
+        // Current role (supervisor or manager)
+        let currentRole = 'supervisor';
+        
+        // DOM elements
+        const supervisorTab = document.getElementById('supervisor-tab');
+        const managerTab = document.getElementById('manager-tab');
+        const roleIndicator = document.getElementById('role-indicator');
+        const loginForm = document.getElementById('login-form');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const togglePassword = document.getElementById('toggle-password');
+        const loginBtn = document.getElementById('login-btn');
+        const btnText = document.getElementById('btn-text');
+        const btnSpinner = document.getElementById('btn-spinner');
+        const errorMessage = document.getElementById('error-message');
+        
+        // Toggle between supervisor and manager tabs
+        supervisorTab.addEventListener('click', () => {
+            if (currentRole !== 'supervisor') {
+                currentRole = 'supervisor';
+                updateUI();
+            }
+        });
+        
+        managerTab.addEventListener('click', () => {
+            if (currentRole !== 'manager') {
+                currentRole = 'manager';
+                updateUI();
+            }
+        });
+        
+        // Toggle password visibility
+        togglePassword.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            togglePassword.innerHTML = type === 'password' ? '<i class="fas fa-eye text-gray-400 hover:text-gray-600"></i>' : '<i class="fas fa-eye-slash text-gray-400 hover:text-gray-600"></i>';
+        });
+        
+        // Update UI based on current role
+        function updateUI() {
+            // Update tabs
+            supervisorTab.classList.toggle('text-indigo-600', currentRole === 'supervisor');
+            supervisorTab.classList.toggle('text-gray-500', currentRole !== 'supervisor');
+            supervisorTab.classList.toggle('border-indigo-600', currentRole === 'supervisor');
+            
+            managerTab.classList.toggle('text-indigo-600', currentRole === 'manager');
+            managerTab.classList.toggle('text-gray-500', currentRole !== 'manager');
+            managerTab.classList.toggle('border-indigo-600', currentRole === 'manager');
+            
+            // Update role indicator
+            roleIndicator.innerHTML = currentRole === 'supervisor' 
+                ? '<i class="fas fa-user-tie mr-2"></i> Supervisor Login' 
+                : '<i class="fas fa-user-cog mr-2"></i> Manager Login';
+            
+            // Clear form
+            usernameInput.value = '';
+            passwordInput.value = '';
+            errorMessage.classList.add('hidden');
+        }
+        
+        // Handle form submission
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Show loading state
+            btnText.textContent = 'Authenticating...';
+            btnSpinner.classList.remove('hidden');
+            loginBtn.disabled = true;
+            errorMessage.classList.add('hidden');
+            
+            // Simulate API call delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            // Validate credentials
+            if (username === credentials[currentRole].username && password === credentials[currentRole].password) {
+                // Successful login - redirect to supervisor.html
+               if (currentRole === 'supervisor') {
+    window.location.href = 'supervisor.html';
+} else if (currentRole === 'manager') {
+    window.location.href = 'manager.html'; // <-- Your manager dashboard page
+}
+            } else {
+                // Failed login
+                errorMessage.classList.remove('hidden');
+                loginForm.classList.add('shake');
+                setTimeout(() => loginForm.classList.remove('shake'), 500);
+            }
+            
+            // Reset button state
+            btnText.textContent = 'Login';
+            btnSpinner.classList.add('hidden');
+            loginBtn.disabled = false;
+        });
+        
+        // Add animation to form elements on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const elements = document.querySelectorAll('.fade-in');
+            elements.forEach(el => {
+                el.style.opacity = '0';
+            });
+            
+            setTimeout(() => {
+                elements.forEach(el => {
+                    el.style.opacity = '1';
+                });
+            }, 100);
+        });
+        
+        // Theme toggle functionality with localStorage persistence
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else if (theme === 'light') {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                // System preference
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                localStorage.setItem('theme', 'system');
+            }
+        }
+        
+        // Apply saved theme on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'system';
+            setTheme(savedTheme);
+        });
+    </script>
+</body>
+</html>

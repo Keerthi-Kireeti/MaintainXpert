@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QR Machine Scanner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="dark-mode.css">
+  <style>
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+    .sidebar.collapsed {
+      width: 80px;
+      overflow: hidden;
+    }
+    .sidebar.collapsed .sidebar-text {
+      display: none;
+    }
+    .sidebar.collapsed .logo-text {
+      display: none;
+    }
+    .sidebar.collapsed .user-name {
+      display: none;
+    }
+    .sidebar.collapsed .user-role {
+      display: none;
+    }
+    .sidebar.collapsed .menu-title {
+      display: none;
+    }
+    .main-content {
+      transition: all 0.3s ease;
+      margin-left: 256px;
+    }
+    .sidebar.collapsed ~ .main-content {
+      margin-left: 80px;
+    }
+    @media (max-width: 768px) {
+      .sidebar.collapsed ~ .main-content {
+        margin-left: 0;
+      }
+    }
+    .notification-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background-color: #ef4444;
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: bold;
+    }
+    .issue-card {
+      transition: all 0.3s ease;
+    }
+    .issue-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    #reader {
+      min-height: 300px;
+      background-color: #f3f4f6;
+    }
+    .scanner-active {
+      border: 4px solid #3b82f6;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { border-color: #3b82f6; }
+      50% { border-color: #93c5fd; }
+      100% { border-color: #3b82f6; }
+    }
+    #loading {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans">
+  <!-- Sidebar -->
+  <div class="sidebar bg-white w-64 border-r border-gray-200 flex flex-col fixed h-full">
+    <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+      <div class="flex items-center">
+        <i class="fas fa-cogs text-blue-600 text-xl"></i>
+        <h1 class="text-xl font-bold text-blue-600 ml-2 sidebar-text logo-text">MaintainXpert</h1>
+      </div>
+      <button class="text-gray-500 hover:text-gray-700 sidebar-toggle hidden md:block">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto">
+      <nav class="p-4">
+        <div class="mb-6">
+          <p class="text-xs uppercase text-gray-500 font-semibold mb-2 menu-title">Main Menu</p>
+          <ul>
+            <li class="mb-1">
+              <a href="supervisor.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                <i class="fas fa-tachometer-alt mr-3"></i>
+                <span class="sidebar-text">Dashboard</span>
+              </a>
+            </li>
+            <li class="mb-1">
+              <a href="machineScanner.html" class="flex items-center p-2 text-primary bg-blue-50 rounded-lg">
+                <i class="fas fa-qrcode mr-3"></i>
+                <span class="sidebar-text">Machine Scanner</span>
+              </a>
+            </li>
+            <li class="mb-1">
+              <a href="maintenance.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                <i class="fas fa-tools mr-3"></i>
+                <span class="sidebar-text">Maintenance</span>
+              </a>
+            </li>
+            <li class="mb-1">
+              <a href="Snotifications.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg relative">
+                <i class="fas fa-bell mr-3"></i>
+                <span class="sidebar-text">Notifications</span>
+                <span class="notification-badge">5</span>
+              </a>
+            </li>
+            <li class="mb-1">
+              <a href="reports.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                <i class="fas fa-chart-bar mr-3"></i>
+                <span class="sidebar-text">Reports</span>
+              </a>
+            </li>
+            <li class="mb-1">
+              <a href="PredictiveAlerts.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                <i class="fas fa-exclamation-triangle mr-3"></i>
+                <span class="sidebar-text">Predictive Alerts</span>
+              </a>
+            </li>
+            <li class="mb-1">
+              <a href="SensorSimulation.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                <i class="fas fa-microchip mr-3"></i>
+                <span class="sidebar-text">Sensor Simulation</span>
+              </a>
+            </li>
+            <li class="mb-1">
+              <a href="OverdueTasks.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                <i class="fas fa-clock mr-3"></i>
+                <span class="sidebar-text">Overdue Tasks</span>
+              </a>
+            </li>
+            <li class="mb-1">
+              <a href="AInotify.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                <i class="fas fa-robot mr-3"></i>
+                <span class="sidebar-text">AI Notify</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <p class="text-xs uppercase text-gray-500 font-semibold mb-2 menu-title">Administration</p>
+          <ul>
+            <li class="mb-1">
+              <a href="#users" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                <i class="fas fa-users mr-3"></i>
+                <span class="sidebar-text">Users</span>
+              </a>
+            </li>
+            <li class="mb-1">
+              <a href="Ssettings.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                <i class="fas fa-cog mr-3"></i>
+                <span class="sidebar-text">Settings</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+    <div class="p-4 border-t border-gray-200">
+      <div class="flex items-center justify-between w-full">
+        <div class="flex items-center space-x-2">
+          <img src="sanjay.jpeg" alt="User" class="w-8 h-8 rounded-full">
+          <div class="leading-tight">
+            <p class="text-sm font-medium user-name">Sanjay Atmakuri</p>
+            <p class="text-xs text-gray-500 user-role">Supervisor</p>
+          </div>
+        </div>
+        <button onclick="logout()" title="Logout" class="sidebar-text">
+          <i class="fas fa-sign-out-alt text-gray-500 hover:text-red-600 text-lg"></i>
+        </button>
+      </div>
+    </div>
+    </div>
+  </div>
+  <div id="loading">
+    <div class="spinner"></div>
+  </div>
+  
+  <div class="main-content ml-64 p-4">
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-3xl font-bold text-blue-600">Machine Scanner</h1>
+        <p class="text-gray-600">Scan the machine QR code to report the issue </p>
+      </div>
+      <!--<div class="bg-blue-100 p-3 rounded-full">
+        <i class="fas fa-qrcode text-blue-600 text-2xl"></i>
+      </div>-->
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div>
+        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+          <h2 class="text-xl font-semibold text-blue-800 mb-2">Scanner</h2>
+          <p class="text-gray-600 text-sm mb-3">Point your camera at the machine's QR code to scan</p>
+          <div id="reader" class="w-full mx-auto mb-4 rounded-lg border-2 border-gray-200 scanner-active"></div>
+          <div class="flex space-x-3">
+            <button id="toggleCamera" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+              <i class="fas fa-sync-alt mr-2"></i> Switch Camera
+            </button>
+            <button id="flashToggle" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition flex items-center">
+              <i class="fas fa-lightbulb mr-2"></i> Flashlight
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div id="result" class="hidden">
+          <div class="bg-white border border-gray-200 rounded-lg p-4 shadow">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-semibold text-gray-800">Machine Details</h3>
+              <span id="scanTime" class="text-xs text-gray-500"></span>
+            </div>
+                        
+            <div class="overflow-x-auto">
+              <table class="w-full table-auto mb-6 text-sm border border-gray-200 rounded-lg">
+                <tbody id="machineDetails" class="text-gray-700"></tbody>
+              </table>
+            </div>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4 rounded">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <i class="fas fa-exclamation-circle text-yellow-400"></i>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm text-yellow-700">
+                    Found an issue with this machine? Please report it below.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-gray-700 font-medium mb-2">Report Issue</label>
+              <textarea id="issueInput" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="4" placeholder="Describe the issue in detail..."></textarea>
+              <div class="flex justify-between mt-2">
+                <span class="text-xs text-gray-500">Minimum 20 characters</span>
+                <span id="charCount" class="text-xs text-gray-500">0/500</span>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+              <button onclick="submitIssue()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                <i class="fas fa-paper-plane mr-2"></i> Submit Issue
+              </button>
+              <button onclick="rescanQR()" class="border border-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-50 transition flex items-center">
+                <i class="fas fa-redo mr-2"></i> Rescan
+              </button>
+            </div>
+
+            <div id="confirmation" class="mt-4 hidden">
+              <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded">
+                <div class="flex">
+                  <div class="flex-shrink-0">
+                    <i class="fas fa-check-circle text-green-400"></i>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm text-green-700">
+                      <span class="font-medium">Success!</span> Your issue has been submitted.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="issuesSection" class="mt-6 hidden">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">Reported Issues</h3>
+          <div id="issuesList" class="space-y-3"></div>
+        </div>
+
+        <div id="noScan" class="bg-blue-50 p-8 rounded-lg text-center">
+          <i class="fas fa-qrcode text-blue-400 text-5xl mb-4"></i>
+          <h3 class="text-xl font-semibold text-blue-800 mb-2">Ready to Scan</h3>
+          <p class="text-gray-600">Point your camera at a machine QR code to get started</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let html5QrCode;
+    let currentCameraId = null;
+    let currentMachineData = null;
+    let flashEnabled = false;
+    const issues = [];
+    let stream = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Sidebar toggle functionality
+      const sidebar = document.querySelector('.sidebar');
+      const sidebarToggle = document.querySelector('.sidebar-toggle');
+      
+      if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+          sidebar.classList.toggle('collapsed');
+          
+          // Change the icon based on state
+          const icon = sidebarToggle.querySelector('i');
+          if (sidebar.classList.contains('collapsed')) {
+            icon.classList.remove('fa-chevron-left');
+            icon.classList.add('fa-chevron-right');
+          } else {
+            icon.classList.remove('fa-chevron-right');
+            icon.classList.add('fa-chevron-left');
+          }
+        });
+      }
+      showLoading();
+      initializeScanner();
+      
+      // Character count for issue textarea
+      document.getElementById('issueInput').addEventListener('input', function() {
+        const charCount = this.value.length;
+        document.getElementById('charCount').textContent = `${charCount}/500`;
+      });
+
+      // Toggle camera button
+      document.getElementById('toggleCamera').addEventListener('click', toggleCamera);
+      
+      // Flash toggle button
+      document.getElementById('flashToggle').addEventListener('click', toggleFlash);
+      
+      // Theme toggle functionality with localStorage persistence
+      function setTheme(theme) {
+          if (theme === 'dark') {
+              document.documentElement.classList.add('dark');
+              localStorage.setItem('theme', 'dark');
+          } else if (theme === 'light') {
+              document.documentElement.classList.remove('dark');
+              localStorage.setItem('theme', 'light');
+          } else {
+              // System preference
+              if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                  document.documentElement.classList.add('dark');
+              } else {
+                  document.documentElement.classList.remove('dark');
+              }
+              localStorage.setItem('theme', 'system');
+          }
+      }
+      
+      // Apply saved theme on page load
+      const savedTheme = localStorage.getItem('theme') || 'system';
+      setTheme(savedTheme);
+    });
+
+    function showLoading() {
+      document.getElementById('loading').style.display = 'flex';
+    }
+
+    function hideLoading() {
+      document.getElementById('loading').style.display = 'none';
+    }
+
+    async function initializeScanner() {
+      try {
+        html5QrCode = new Html5Qrcode("reader");
+        const qrConfig = { fps: 10, qrbox: 250 };
+        
+        // Try to get the environment camera first
+        const devices = await Html5Qrcode.getCameras();
+        if (devices && devices.length) {
+          // Prefer rear camera if available
+          const rearCamera = devices.find(d => d.label.toLowerCase().includes('back'));
+          const cameraId = rearCamera ? rearCamera.id : devices[0].id;
+          currentCameraId = cameraId;
+          
+          await startScanner(cameraId, qrConfig);
+          hideLoading();
+        } else {
+          await startScanner("environment", qrConfig);
+          hideLoading();
+        }
+      } catch (err) {
+        console.error("Camera Error:", err);
+        try {
+          await startScanner("environment", qrConfig);
+          hideLoading();
+        } catch (e) {
+          console.error("Fallback Scanner Error:", e);
+          hideLoading();
+          alert("Failed to access camera. Please ensure camera permissions are granted and try again.");
+        }
+      }
+    }
+
+    async function startScanner(cameraId, config) {
+      try {
+        document.getElementById('noScan').classList.add('hidden');
+        await html5QrCode.start(
+          cameraId,
+          config,
+          (decodedText, decodedResult) => {
+            onScanSuccess(decodedText);
+          },
+          (errorMessage) => {
+            // Optional: Display error to user
+            console.log(`QR Scan Error: ${errorMessage}`);
+          }
+        );
+        
+        // Store the video stream for flashlight control
+        stream = html5QrCode.getRunningTrackCapabilities();
+      } catch (err) {
+        console.error("Scanner Error:", err);
+        throw err;
+      }
+    }
+
+    async function toggleCamera() {
+      if (!html5QrCode) return;
+      
+      showLoading();
+      try {
+        const devices = await Html5Qrcode.getCameras();
+        if (devices && devices.length > 1) {
+          await html5QrCode.stop();
+          // Find the next camera
+          const currentIndex = devices.findIndex(d => d.id === currentCameraId);
+          const nextIndex = (currentIndex + 1) % devices.length;
+          currentCameraId = devices[nextIndex].id;
+          
+          const qrConfig = { fps: 10, qrbox: 250 };
+          await startScanner(currentCameraId, qrConfig);
+          hideLoading();
+        } else {
+          alert("Only one camera available.");
+          hideLoading();
+        }
+      } catch (err) {
+        console.error("Error toggling camera:", err);
+        hideLoading();
+      }
+    }
+
+    async function toggleFlash() {
+      if (!stream) {
+        alert("Flashlight control requires an active camera stream.");
+        return;
+      }
+      
+      try {
+        const track = html5QrCode.getRunningTrack();
+        if (!track) {
+          alert("No active video track found.");
+          return;
+        }
+        
+        // Try to get the capabilities
+        const capabilities = track.getCapabilities();
+        if (!capabilities.torch) {
+          alert("Flashlight not supported on this device or camera.");
+          return;
+        }
+        
+        flashEnabled = !flashEnabled;
+        await track.applyConstraints({
+          advanced: [{torch: flashEnabled}]
+        });
+        
+        const flashButton = document.getElementById('flashToggle');
+        if (flashEnabled) {
+          flashButton.innerHTML = '<i class="fas fa-lightbulb mr-2"></i> Flashlight ON';
+          flashButton.classList.remove('bg-gray-600');
+          flashButton.classList.add('bg-yellow-500');
+        } else {
+          flashButton.innerHTML = '<i class="fas fa-lightbulb mr-2"></i> Flashlight OFF';
+          flashButton.classList.remove('bg-yellow-500');
+          flashButton.classList.add('bg-gray-600');
+        }
+      } catch (err) {
+        console.error("Error toggling flashlight:", err);
+        alert("Failed to toggle flashlight. It might not be supported on this device.");
+      }
+    }
+
+    async function onScanSuccess(decodedText) {
+      try {
+        await html5QrCode.stop();
+        currentMachineData = decodedText;
+        parseQR(decodedText);
+        document.getElementById('result').classList.remove('hidden');
+        document.getElementById('noScan').classList.add('hidden');
+        document.getElementById('reader').classList.remove('scanner-active');
+        
+        // Show scan time
+        const now = new Date();
+        document.getElementById('scanTime').textContent = `Scanned at ${now.toLocaleTimeString()}`;
+        
+        // Load any existing issues for this machine
+        loadIssues();
+      } catch (err) {
+        console.error("Error stopping scanner:", err);
+      }
+    }
+
+    function parseQR(data) {
+      // Sample QR data format: "Machine Name|Company|Model|MFG Date|Capacity|Serial Number|Location"
+      // If the QR doesn't contain all fields, we'll use defaults
+      const fields = ["Machine Name", "Company", "Model", "MFG Date", "Capacity", "Serial Number", "Location"];
+      const values = data.split("|").map(v => v.trim()).filter(v => v);
+      
+      // Fill in missing values with defaults if needed
+      while (values.length < fields.length) {
+        values.push("-");
+      }
+      
+      let html = "";
+      
+      for (let i = 0; i < fields.length; i++) {
+        html += `
+          <tr>
+            <td class="border px-4 py-2 font-medium bg-gray-50">${fields[i]}</td>
+            <td class="border px-4 py-2">${values[i] || "-"}</td>
+          </tr>
+        `;
+      }
+      
+      document.getElementById("machineDetails").innerHTML = html;
+    }
+
+    function submitIssue() {
+      const issueText = document.getElementById("issueInput").value.trim();
+      
+      if (issueText === "") {
+        alert("Please enter an issue description.");
+        return;
+      }
+      
+      if (issueText.length < 20) {
+        alert("Please provide more details (minimum 20 characters).");
+        return;
+      }
+      
+      if (!currentMachineData) {
+        alert("No machine scanned. Please scan a machine first.");
+        return;
+      }
+      
+      // Create new issue
+      const newIssue = {
+        id: Date.now(),
+        machineData: currentMachineData,
+        text: issueText,
+        date: new Date(),
+        status: "Pending"
+      };
+      
+      // Add to issues array
+      issues.push(newIssue);
+      
+      // Clear input
+      document.getElementById("issueInput").value = "";
+      document.getElementById("charCount").textContent = "0/500";
+      
+      // Show confirmation
+      const confirmation = document.getElementById("confirmation");
+      confirmation.classList.remove("hidden");
+      
+      // Hide confirmation after 5 seconds
+      setTimeout(() => {
+        confirmation.classList.add("hidden");
+      }, 5000);
+      
+      // Refresh issues list
+      loadIssues();
+    }
+
+    function loadIssues() {
+    
+    // Logout function
+    window.logout = function() {
+      alert('Logging out...');
+      // In a real app, you would redirect to logout endpoint
+      // window.location.href = '/logout';
+    };
+      if (!currentMachineData) return;
+      
+      // Filter issues for current machine
+      const machineIssues = issues.filter(issue => 
+        issue.machineData === currentMachineData
+      );
+      
+      if (machineIssues.length === 0) {
+        document.getElementById("issuesSection").classList.add("hidden");
+        return;
+      }
+      
+      // Show issues section
+      document.getElementById("issuesSection").classList.remove("hidden");
+      
+      // Sort by date (newest first)
+      machineIssues.sort((a, b) => b.date - a.date);
+      
+      // Generate HTML for issues
+      let issuesHTML = "";
+      
+      machineIssues.forEach(issue => {
+        const dateStr = issue.date.toLocaleString();
+        
+        issuesHTML += `
+          <div class="issue-card bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-sm font-medium text-gray-700">${dateStr}</span>
+              <span class="px-2 py-1 text-xs rounded-full ${issue.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}">
+                ${issue.status}
+              </span>
+            </div>
+            <p class="text-gray-600">${issue.text}</p>
+          </div>
+        `;
+      });
+      
+      document.getElementById("issuesList").innerHTML = issuesHTML;
+    }
+
+    async function rescanQR() {
+      try {
+        document.getElementById("result").classList.add("hidden");
+        document.getElementById("issuesSection").classList.add("hidden");
+        document.getElementById("reader").classList.add("scanner-active");
+        document.getElementById('noScan').classList.add('hidden');
+        
+        const qrConfig = { fps: 10, qrbox: 250 };
+        await startScanner(currentCameraId || "environment", qrConfig);
+      } catch (err) {
+        console.error("Error during rescan:", err);
+      }
+    }
+  </script>
+</body>
+</html>

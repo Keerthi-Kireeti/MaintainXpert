@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#1e40af',
+                        accent: '#3b82f6',
+                        danger: '#ef4444',
+                        warning: '#f59e0b',
+                        success: '#10b981',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e5e7eb;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .chart-container {
+            position: relative;
+            height: 250px;
+        }
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        .sidebar.collapsed {
+            width: 80px;
+            overflow: hidden;
+        }
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+        .sidebar.collapsed .logo-text {
+            display: none;
+        }
+        .sidebar.collapsed .user-name {
+            display: none;
+        }
+        .sidebar.collapsed .user-role {
+            display: none;
+        }
+        .sidebar.collapsed .menu-title {
+            display: none;
+        }
+        .main-content {
+            transition: all 0.3s ease;
+            margin-left: 256px;
+        }
+        .sidebar.collapsed ~ .main-content {
+            margin-left: 80px;
+        }
+        @media (max-width: 768px) {
+            .sidebar.collapsed ~ .main-content {
+                margin-left: 0;
+            }
+        }
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                z-index: 1000;
+                height: 100vh;
+            }
+            .sidebar.collapsed {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-white w-64 border-r border-gray-200 flex flex-col">
+            <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-cogs text-primary text-xl"></i>
+                    <h1 class="text-xl font-bold text-primary ml-2 sidebar-text logo-text">MaintainXpert</h1>
+                </div>
+                <button class="text-gray-500 hover:text-gray-700 sidebar-toggle hidden md:block">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto">
+                <nav class="p-4">
+                    <div class="mb-6">
+                        <p class="text-xs uppercase text-gray-500 font-semibold mb-2 menu-title">Main Menu</p>
+                        <ul>
+                            <li class="mb-1">
+                                <a href="supervisor.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-tachometer-alt mr-3"></i>
+                                    <span class="sidebar-text">Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="machineScanner.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-qrcode mr-3"></i>
+                                    <span class="sidebar-text">Machine Scanner</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="maintenance.html" class="flex items-center p-2 text-primary bg-blue-50 rounded-lg">
+                                    <i class="fas fa-tools mr-3"></i>
+                                    <span class="sidebar-text">Maintenance</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="Snotifications.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg relative">
+                                    <i class="fas fa-bell mr-3"></i>
+                                    <span class="sidebar-text">Notifications</span>
+                                    <span class="notification-badge">5</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="reports.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-chart-bar mr-3"></i>
+                                    <span class="sidebar-text">Reports</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="PredictiveAlerts.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                                    <span class="sidebar-text">Predictive Alerts</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="SensorSimulation.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-microchip mr-3"></i>
+                                    <span class="sidebar-text">Sensor Simulation</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="OverdueTasks.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-clock mr-3"></i>
+                                    <span class="sidebar-text">Overdue Tasks</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="AInotify.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-robot mr-3"></i>
+                                    <span class="sidebar-text">AI Notify</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mb-6">
+                        <p class="text-xs uppercase text-gray-500 font-semibold mb-2 menu-title">Administration</p>
+                        <ul>
+                            <li class="mb-1">
+                                <a href="#users" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-users mr-3"></i>
+                                    <span class="sidebar-text">Users</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="Ssettings.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-cog mr-3"></i>
+                                    <span class="sidebar-text">Settings</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+            <div class="p-4 border-t border-gray-200">
+                <div class="flex items-center justify-between w-full">
+                    <!-- Profile + Name -->
+                    <div class="flex items-center space-x-2">
+                        <img src="sanjay.jpeg" alt="User" class="w-8 h-8 rounded-full">
+                        <div class="leading-tight">
+                            <p class="text-sm font-medium user-name">Sanjay Atmakuri</p>
+                            <p class="text-xs text-gray-500 user-role">Supervisor</p>
+                        </div>
+                    </div>
+                    <!-- Logout Icon -->
+                    <button onclick="logout()" title="Logout" class="sidebar-text">
+                        <i class="fas fa-sign-out-alt text-gray-500 hover:text-red-600 text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto main-content">
+            <!-- Header -->
+            <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+                <button class="text-gray-600 md:hidden" id="mobileSidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-tools text-2xl text-primary bg-blue-50 rounded-lg"></i>
+                    <h1 class="text-blue-700 text-lg font-semibold">Maintenance</h1>
+
+                </div>
+                <nav>
+                    <!--<ul class="flex space-x-6">
+                        <li><a href="#" class="hover:text-accent transition">Dashboard</a></li>
+                        <li><a href="#" class="hover:text-accent transition">Machines</a></li>
+                        <li><a href="#" class="hover:text-accent transition">Technicians</a></li>
+                        <li><a href="#" class="hover:text-accent transition">Reports</a></li>
+                    </ul>-->
+                </nav>
+                <button class="bg-accent hover:bg-secondary px-4 py-2 rounded-lg transition">
+                    <i class="fas fa-plus mr-2"></i>New Repair
+                </button>
+            </div>
+        </header>
+
+        <main class="container mx-auto px-4 py-8">
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-primary">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500">Active Repairs</p>
+                            <h3 class="text-3xl font-bold mt-2">12</h3>
+                        </div>
+                        <i class="fas fa-wrench text-primary text-2xl"></i>
+                    </div>
+                    <p class="text-sm text-success mt-2"><i class="fas fa-arrow-up mr-1"></i> 2 from yesterday</p>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-success">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500">Completed Today</p>
+                            <h3 class="text-3xl font-bold mt-2">5</h3>
+                        </div>
+                        <i class="fas fa-check-circle text-success text-2xl"></i>
+                    </div>
+                    <p class="text-sm text-success mt-2"><i class="fas fa-arrow-up mr-1"></i> 1 from yesterday</p>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-warning">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500">Avg. Repair Time</p>
+                            <h3 class="text-3xl font-bold mt-2">3.2 <span class="text-lg">days</span></h3>
+                        </div>
+                        <i class="fas fa-clock text-warning text-2xl"></i>
+                    </div>
+                    <p class="text-sm text-danger mt-2"><i class="fas fa-arrow-down mr-1"></i> 0.5 from last week</p>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-danger">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500">Overdue Repairs</p>
+                            <h3 class="text-3xl font-bold mt-2">2</h3>
+                        </div>
+                        <i class="fas fa-exclamation-triangle text-danger text-2xl"></i>
+                    </div>
+                    <p class="text-sm text-danger mt-2"><i class="fas fa-arrow-up mr-1"></i> 1 from yesterday</p>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Active Repairs Section -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                            <h2 class="text-xl font-semibold text-gray-800">Active Repairs</h2>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 bg-gray-100 rounded-lg text-sm">All</button>
+                                <button class="px-3 py-1 bg-primary text-white rounded-lg text-sm">Priority</button>
+                                <button class="px-3 py-1 bg-gray-100 rounded-lg text-sm">Regular</button>
+                            </div>
+                        </div>
+                        <div class="divide-y divide-gray-200">
+                            <!-- Repair Item 1 -->
+                            <div class="p-6 hover:bg-gray-50 transition">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <div class="flex items-center space-x-2">
+                                            <h3 class="font-medium">CNC Milling Machine #452</h3>
+                                            <span class="px-2 py-1 bg-warning text-white text-xs rounded-full">High Priority</span>
+                                        </div>
+                                        <p class="text-sm text-gray-500 mt-1">Mechanical failure in spindle motor</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm text-gray-500">Est. completion</p>
+                                        <p class="font-medium">Tomorrow, 2 PM</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span>Assigned to: <span class="font-medium">John Smith</span></span>
+                                        <span>65% complete</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill bg-accent" style="width: 65%"></div>
+                                    </div>
+                                </div>
+                                <div class="mt-3 flex justify-between text-sm">
+                                    <span class="text-gray-500">Started: 2 days ago</span>
+                                    <span class="text-primary font-medium">View details</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Repair Item 2 -->
+                            <div class="p-6 hover:bg-gray-50 transition">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <div class="flex items-center space-x-2">
+                                            <h3 class="font-medium">Hydraulic Press #128</h3>
+                                            <span class="px-2 py-1 bg-primary text-white text-xs rounded-full">Medium Priority</span>
+                                        </div>
+                                        <p class="text-sm text-gray-500 mt-1">Leak in hydraulic system</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm text-gray-500">Est. completion</p>
+                                        <p class="font-medium">Friday, 10 AM</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span>Assigned to: <span class="font-medium">Sarah Johnson</span></span>
+                                        <span>30% complete</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill bg-accent" style="width: 30%"></div>
+                                    </div>
+                                </div>
+                                <div class="mt-3 flex justify-between text-sm">
+                                    <span class="text-gray-500">Started: 1 day ago</span>
+                                    <span class="text-primary font-medium">View details</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Repair Item 3 -->
+                            <div class="p-6 hover:bg-gray-50 transition">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <div class="flex items-center space-x-2">
+                                            <h3 class="font-medium">Industrial Oven #75</h3>
+                                            <span class="px-2 py-1 bg-danger text-white text-xs rounded-full">Overdue</span>
+                                        </div>
+                                        <p class="text-sm text-gray-500 mt-1">Temperature control failure</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm text-gray-500">Est. completion</p>
+                                        <p class="font-medium text-danger">Overdue by 2 days</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span>Assigned to: <span class="font-medium">Mike Chen</span></span>
+                                        <span>85% complete</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill bg-danger" style="width: 85%"></div>
+                                    </div>
+                                </div>
+                                <div class="mt-3 flex justify-between text-sm">
+                                    <span class="text-gray-500">Started: 5 days ago</span>
+                                    <span class="text-primary font-medium">View details</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="px-6 py-4 border-t border-gray-200 text-center">
+                            <button class="text-primary font-medium hover:text-secondary transition">
+                                <i class="fas fa-plus mr-1"></i>Load More Repairs
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Sidebar -->
+                <div class="space-y-6">
+                    <!-- Repair Prediction -->
+                    <div class="bg-white rounded-xl shadow-md p-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Repair Time Prediction</h2>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Machine Type</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent">
+                                <option>CNC Milling Machine</option>
+                                <option>Hydraulic Press</option>
+                                <option>Industrial Oven</option>
+                                <option>Lathe Machine</option>
+                                <option>Conveyor System</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Issue Type</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent">
+                                <option>Mechanical Failure</option>
+                                <option>Electrical Issue</option>
+                                <option>Hydraulic Leak</option>
+                                <option>Control System</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Severity</label>
+                            <div class="flex space-x-4">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="severity" class="h-4 w-4 text-accent" checked>
+                                    <span class="ml-2">Low</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="severity" class="h-4 w-4 text-accent">
+                                    <span class="ml-2">Medium</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="severity" class="h-4 w-4 text-accent">
+                                    <span class="ml-2">High</span>
+                                </label>
+                            </div>
+                        </div>
+                        <button class="w-full bg-primary hover:bg-secondary text-white py-2 rounded-lg transition">
+                            Calculate Estimate
+                        </button>
+                        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                            <p class="text-sm text-gray-500">Estimated repair time:</p>
+                            <h3 class="text-2xl font-bold text-primary mt-1">2.5 days</h3>
+                            <p class="text-sm text-gray-500 mt-2">Based on 32 similar past repairs</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Completions -->
+                    <div class="bg-white rounded-xl shadow-md p-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Recently Completed</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="bg-success bg-opacity-10 p-2 rounded-lg mr-3">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium">Lathe Machine #210</h4>
+                                    <p class="text-sm text-gray-500">Bearing replacement</p>
+                                    <p class="text-xs text-gray-400 mt-1">Completed 3 hours ago</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="bg-success bg-opacity-10 p-2 rounded-lg mr-3">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium">Conveyor Belt #45</h4>
+                                    <p class="text-sm text-gray-500">Motor alignment</p>
+                                    <p class="text-xs text-gray-400 mt-1">Completed yesterday</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="bg-success bg-opacity-10 p-2 rounded-lg mr-3">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium">Packaging Machine #12</h4>
+                                    <p class="text-sm text-gray-500">Sensor calibration</p>
+                                    <p class="text-xs text-gray-400 mt-1">Completed 2 days ago</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="w-full mt-4 text-primary font-medium hover:text-secondary transition text-sm">
+                            View All Completed Repairs
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Repair History Chart -->
+            <div class="mt-8 bg-white rounded-xl shadow-md p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-gray-800">Repair History (Last 6 Months)</h2>
+                    <select class="px-3 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-sm">
+                        <option>All Machines</option>
+                        <option>CNC Machines</option>
+                        <option>Presses</option>
+                        <option>Ovens</option>
+                        <option>Conveyors</option>
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <canvas id="repairChart"></canvas>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Sidebar toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
+            const mainContent = document.querySelector('.main-content');
+
+            // Desktop toggle
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+
+                    // Change the icon based on state
+                    const icon = sidebarToggle.querySelector('i');
+                    if (sidebar.classList.contains('collapsed')) {
+                        icon.classList.remove('fa-chevron-left');
+                        icon.classList.add('fa-chevron-right');
+                    } else {
+                        icon.classList.remove('fa-chevron-right');
+                        icon.classList.add('fa-chevron-left');
+                    }
+                });
+            }
+
+            // Mobile toggle
+            if (mobileSidebarToggle) {
+                mobileSidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    // On mobile, we want to push content when sidebar is open
+                    if (window.innerWidth <= 768) {
+                        if (sidebar.classList.contains('collapsed')) {
+                            mainContent.style.marginLeft = '0';
+                        } else {
+                            mainContent.style.marginLeft = '256px';
+                        }
+                    }
+                });
+            }
+
+            const ctx = document.getElementById('repairChart').getContext('2d');
+            const repairChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [
+                        {
+                            label: 'Completed Repairs',
+                            data: [12, 19, 15, 21, 18, 24],
+                            backgroundColor: '#3b82f6',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Average Repair Time (days)',
+                            data: [3.5, 3.2, 2.8, 3.1, 2.9, 2.7],
+                            backgroundColor: '#10b981',
+                            borderRadius: 4,
+                            type: 'line',
+                            borderColor: '#10b981',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#10b981',
+                            pointRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                drawOnChartArea: true,
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    }
+                }
+            });
+
+            // Simulate loading for active repairs
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const targetWidth = bar.style.width;
+                bar.style.width = '0';
+                setTimeout(() => {
+                    bar.style.width = targetWidth;
+                }, 300);
+            });
+        });
+
+        // Simple prediction calculator (demo purposes)
+        function calculateEstimate() {
+            // In a real app, this would call an API with ML model
+            const machineType = document.querySelector('select').value;
+            const issueType = document.querySelectorAll('select')[1].value;
+            const severity = document.querySelector('input[name="severity"]:checked').value;
+            
+            // Mock calculation
+            let baseTime = 1; // days
+            if (machineType.includes('CNC')) baseTime = 2.5;
+            if (machineType.includes('Hydraulic')) baseTime = 1.8;
+            if (machineType.includes('Oven')) baseTime = 1.2;
+            
+            if (issueType.includes('Electrical')) baseTime *= 1.3;
+            if (issueType.includes('Hydraulic')) baseTime *= 1.2;
+            
+            if (severity === 'Medium') baseTime *= 1.5;
+            if (severity === 'High') baseTime *= 2;
+            
+            // Add some random variation for demo
+            baseTime += (Math.random() * 0.5 - 0.25);
+            baseTime = Math.max(0.5, baseTime).toFixed(1);
+            
+            document.querySelector('.text-2xl.font-bold.text-primary').textContent = baseTime + ' days';
+        }
+
+        // Attach event listeners
+        document.querySelector('button.bg-primary').addEventListener('click', calculateEstimate);
+
+        // Logout function
+        window.logout = function() {
+            alert('Logging out...');
+            // In a real app, you would redirect to logout endpoint
+            // window.location.href = '/logout';
+        };
+        
+        // Theme toggle functionality with localStorage persistence
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else if (theme === 'light') {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                // System preference
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                localStorage.setItem('theme', 'system');
+            }
+        }
+        
+        // Apply saved theme on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'system';
+            setTheme(savedTheme);
+        });
+    </script>
+</body>
+</html>

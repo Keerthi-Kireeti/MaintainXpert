@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Supervisors</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#1e40af',
+                        accent: '#3b82f6',
+                        danger: '#ef4444',
+                        warning: '#f59e0b',
+                        success: '#10b981',
+                        dark: '#1f2937'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        .sidebar.collapsed {
+            width: 80px;
+            overflow: hidden;
+        }
+        .sidebar.collapsed .sidebar-text,
+        .sidebar.collapsed .logo-text,
+        .sidebar.collapsed .user-name,
+        .sidebar.collapsed .user-role,
+        .sidebar.collapsed .menu-title,
+        .sidebar.collapsed .notification-badge {
+            display: none !important;
+        }
+        .main-content {
+            transition: all 0.3s ease;
+            margin-left: 256px;
+        }
+        .sidebar.collapsed ~ .main-content {
+            margin-left: 80px;
+        }
+        @media (max-width: 768px) {
+            .sidebar.collapsed ~ .main-content {
+                margin-left: 0;
+            }
+        }
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            background-color: #ef4444;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        .supervisor-card {
+            transition: all 0.3s ease;
+        }
+        .supervisor-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e5e7eb;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .status-active {
+            background-color: #dcfce7;
+            color: #10b981;
+        }
+        .status-inactive {
+            background-color: #fee2e2;
+            color: #ef4444;
+        }
+        .status-vacation {
+            background-color: #fef3c7;
+            color: #f59e0b;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                z-index: 1000;
+                height: 100vh;
+            }
+            .sidebar.collapsed {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-white w-64 border-r border-gray-200 flex flex-col">
+            <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-cogs text-primary text-xl"></i>
+                    <h1 class="text-xl font-bold text-primary ml-2 sidebar-text logo-text">MaintainXpert</h1>
+                </div>
+                <button class="text-gray-500 hover:text-gray-700 sidebar-toggle hidden md:block" id="sidebarToggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto">
+                <nav class="p-4">
+                    <div class="mb-6">
+                        <p class="text-xs uppercase text-gray-500 font-semibold mb-2">Main Menu</p>
+                        <ul>
+                            <li class="mb-1">
+                                <a href="Manager.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-tachometer-alt mr-3"></i>
+                                    <span class="sidebar-text">Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="MSupervisors.html" class="flex items-center p-2 text-primary bg-blue-50 rounded-lg">
+                                    <i class="fas fa-user-tie mr-3"></i>
+                                    <span class="sidebar-text">Manage Supervisors</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="Maintenance.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-calendar-alt mr-3"></i>
+                                    <span class="sidebar-text">Maintenance Calendar</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="NotificationsSettings.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg relative">
+                                    <i class="fas fa-bell mr-3"></i>
+                                    <span class="sidebar-text">Notifications Settings</span>
+                                    <span class="notification-badge">5</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="Reports.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-chart-bar mr-3"></i>
+                                    <span class="sidebar-text">Reports</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mb-6">
+                        <p class="text-xs uppercase text-gray-500 font-semibold mb-2">Management</p>
+                        <ul>
+                            <li class="mb-1">
+                                <a href="WorkOrders.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-clipboard-list mr-3"></i>
+                                    <span class="sidebar-text">Work Orders</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="Analytics.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-chart-line mr-3"></i>
+                                    <span class="sidebar-text">Analytics</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="Inventory.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-boxes mr-3"></i>
+                                    <span class="sidebar-text">Inventory</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="PredictiveAlerts.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                                    <span class="sidebar-text">Predictive Alerts</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="OverdueTasks.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-clock mr-3"></i>
+                                    <span class="sidebar-text">Overdue Tasks</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="TechnicianLogs.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-clipboard-check mr-3"></i>
+                                    <span class="sidebar-text">Technician Logs</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mb-6">
+                        <p class="text-xs uppercase text-gray-500 font-semibold mb-2">Administration</p>
+                        <ul>
+                            <li class="mb-1">
+                                <a href="UserManagement.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-users-cog mr-3"></i>
+                                    <span class="sidebar-text">User Management</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="MSettings.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-cog mr-3"></i>
+                                    <span class="sidebar-text">Settings</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+            <div class="p-4 border-t border-gray-200">
+                <div class="flex items-center justify-between w-full">
+                    <!-- Profile Info -->
+                    <div class="flex items-center space-x-2">
+                        <img src="pop.jpeg" alt="User" class="w-8 h-8 rounded-full">
+                        <div class="leading-tight">
+                            <p class="text-sm font-medium user-name">Pruthvi Chevuri</p>
+                            <p class="text-xs text-gray-500 user-role">Maintenance Manager</p>
+                        </div>
+                    </div>
+                    <!-- Logout Icon -->
+                    <button onclick="logout()" title="Logout" class="sidebar-text">
+                        <i class="fas fa-sign-out-alt text-gray-500 hover:text-red-600 text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto main-content">
+            <!-- Header -->
+            <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+                <button class="text-gray-600 md:hidden" id="mobileSidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h2 class="text-lg font-semibold text-gray-800">Manage Supervisors</h2>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <button class="text-gray-600 hover:text-gray-800" id="notificationButton">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">5</span>
+                        </button>
+                    </div>
+                    <div class="flex items-center">
+                        <img src="pop.jpeg" alt="User" class="w-8 h-8 rounded-full mr-2">
+                        <span class="hidden md:inline">Pruthvi Chevuri</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="p-4">
+                <!-- Action Buttons -->
+                <div class="flex flex-wrap justify-between items-center mb-6">
+                    <div class="flex space-x-2 mb-2 sm:mb-0">
+                        <button class="bg-primary text-white px-4 py-2 rounded-lg flex items-center">
+                            <i class="fas fa-plus mr-2"></i>
+                            <span>Add Supervisor</span>
+                        </button>
+                        <button class="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-lg flex items-center">
+                            <i class="fas fa-filter mr-2"></i>
+                            <span>Filter</span>
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <input type="text" placeholder="Search supervisors..." class="border border-gray-300 rounded-lg pl-10 pr-4 py-2 w-full sm:w-64">
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                </div>
+
+                <!-- Supervisors Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                    <!-- Supervisor Card 1 -->
+                    <div class="supervisor-card bg-white rounded-lg shadow overflow-hidden">
+                        <div class="p-4 border-b border-gray-200">
+                            <div class="flex justify-between items-start">
+                                <div class="flex items-center">
+                                    <img src="sanjay.jpeg" alt="Supervisor" class="w-12 h-12 rounded-full mr-3">
+                                    <div>
+                                        <h3 class="font-semibold text-lg">Sanjay Atmakuri</h3>
+                                        <p class="text-gray-600 text-sm">Zone A Supervisor</p>
+                                        <span class="status-badge status-active mt-1">Active</span>
+                                    </div>
+                                </div>
+                                <div class="dropdown relative">
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <p class="text-sm text-gray-500">Completion Rate</p>
+                                    <p class="font-semibold text-lg">85%</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Team Size</p>
+                                    <p class="font-semibold text-lg">8 Technicians</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Active Tasks</p>
+                                    <p class="font-semibold text-lg">12</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Performance</p>
+                                    <div class="flex items-center">
+                                        <span class="text-lg font-semibold mr-1">4.2</span>
+                                        <div class="text-yellow-400">
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="flex-1 bg-primary text-white py-2 rounded-lg text-sm hover:bg-secondary transition-colors">
+                                    <i class="fas fa-eye mr-1"></i> View Details
+                                </button>
+                                <button class="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg text-sm hover:bg-gray-200 transition-colors">
+                                    <i class="fas fa-message mr-1"></i> Message
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Supervisor Card 2 -->
+                    <div class="supervisor-card bg-white rounded-lg shadow overflow-hidden">
+                        <div class="p-4 border-b border-gray-200">
+                            <div class="flex justify-between items-start">
+                                <div class="flex items-center">
+                                    <img src="kk.jpeg" alt="Supervisor" class="w-12 h-12 rounded-full mr-3">
+                                    <div>
+                                        <h3 class="font-semibold text-lg">Keerthi Kireeti</h3>
+                                        <p class="text-gray-600 text-sm">Zone B Supervisor</p>
+                                        <span class="status-badge status-active mt-1">Active</span>
+                                    </div>
+                                </div>
+                                <div class="dropdown relative">
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <p class="text-sm text-gray-500">Completion Rate</p>
+                                    <p class="font-semibold text-lg">92%</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Team Size</p>
+                                    <p class="font-semibold text-lg">10 Technicians</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Active Tasks</p>
+                                    <p class="font-semibold text-lg">15</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Performance</p>
+                                    <div class="flex items-center">
+                                        <span class="text-lg font-semibold mr-1">4.7</span>
+                                        <div class="text-yellow-400">
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="flex-1 bg-primary text-white py-2 rounded-lg text-sm hover:bg-secondary transition-colors">
+                                    <i class="fas fa-eye mr-1"></i> View Details
+                                </button>
+                                <button class="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg text-sm hover:bg-gray-200 transition-colors">
+                                    <i class="fas fa-message mr-1"></i> Message
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Supervisor Card 3 -->
+                    <div class="supervisor-card bg-white rounded-lg shadow overflow-hidden">
+                        <div class="p-4 border-b border-gray-200">
+                            <div class="flex justify-between items-start">
+                                <div class="flex items-center">
+                                    <img src="sai.jpeg" alt="Supervisor" class="w-12 h-12 rounded-full mr-3">
+                                    <div>
+                                        <h3 class="font-semibold text-lg">Sainadh Maharaj</h3>
+                                        <p class="text-gray-600 text-sm">Zone C Supervisor</p>
+                                        <span class="status-badge status-active mt-1">Active</span>
+                                    </div>
+                                </div>
+                                <div class="dropdown relative">
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <p class="text-sm text-gray-500">Completion Rate</p>
+                                    <p class="font-semibold text-lg">78%</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Team Size</p>
+                                    <p class="font-semibold text-lg">7 Technicians</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Active Tasks</p>
+                                    <p class="font-semibold text-lg">9</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Performance</p>
+                                    <div class="flex items-center">
+                                        <span class="text-lg font-semibold mr-1">3.9</span>
+                                        <div class="text-yellow-400">
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="flex-1 bg-primary text-white py-2 rounded-lg text-sm hover:bg-secondary transition-colors">
+                                    <i class="fas fa-eye mr-1"></i> View Details
+                                </button>
+                                <button class="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg text-sm hover:bg-gray-200 transition-colors">
+                                    <i class="fas fa-message mr-1"></i> Message
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Supervisor Card 4 -->
+                    <div class="supervisor-card bg-white rounded-lg shadow overflow-hidden">
+                        <div class="p-4 border-b border-gray-200">
+                            <div class="flex justify-between items-start">
+                                <div class="flex items-center">
+                                    <img src="user-avatar.jpg" alt="Supervisor" class="w-12 h-12 rounded-full mr-3">
+                                    <div>
+                                        <h3 class="font-semibold text-lg">Sai Teja</h3>
+                                        <p class="text-gray-600 text-sm">Zone D Supervisor</p>
+                                        <span class="status-badge status-active mt-1">Active</span>
+                                    </div>
+                                </div>
+                                <div class="dropdown relative">
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <p class="text-sm text-gray-500">Completion Rate</p>
+                                    <p class="font-semibold text-lg">88%</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Team Size</p>
+                                    <p class="font-semibold text-lg">9 Technicians</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Active Tasks</p>
+                                    <p class="font-semibold text-lg">11</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Performance</p>
+                                    <div class="flex items-center">
+                                        <span class="text-lg font-semibold mr-1">4.5</span>
+                                        <div class="text-yellow-400">
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="flex-1 bg-primary text-white py-2 rounded-lg text-sm hover:bg-secondary transition-colors">
+                                    <i class="fas fa-eye mr-1"></i> View Details
+                                </button>
+                                <button class="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg text-sm hover:bg-gray-200 transition-colors">
+                                    <i class="fas fa-message mr-1"></i> Message
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Supervisor Card 5 -->
+                    <div class="supervisor-card bg-white rounded-lg shadow overflow-hidden">
+                        <div class="p-4 border-b border-gray-200">
+                            <div class="flex justify-between items-start">
+                                <div class="flex items-center">
+                                    <img src="user-avatar.jpg" alt="Supervisor" class="w-12 h-12 rounded-full mr-3">
+                                    <div>
+                                        <h3 class="font-semibold text-lg">Rahul Sharma</h3>
+                                        <p class="text-gray-600 text-sm">Zone E Supervisor</p>
+                                        <span class="status-badge status-vacation mt-1">On Vacation</span>
+                                    </div>
+                                </div>
+                                <div class="dropdown relative">
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <p class="text-sm text-gray-500">Completion Rate</p>
+                                    <p class="font-semibold text-lg">82%</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Team Size</p>
+                                    <p class="font-semibold text-lg">6 Technicians</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Active Tasks</p>
+                                    <p class="font-semibold text-lg">8</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Performance</p>
+                                    <div class="flex items-center">
+                                        <span class="text-lg font-semibold mr-1">4.1</span>
+                                        <div class="text-yellow-400">
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="flex-1 bg-primary text-white py-2 rounded-lg text-sm hover:bg-secondary transition-colors">
+                                    <i class="fas fa-eye mr-1"></i> View Details
+                                </button>
+                                <button class="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg text-sm hover:bg-gray-200 transition-colors">
+                                    <i class="fas fa-message mr-1"></i> Message
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Supervisor Card 6 -->
+                    <div class="supervisor-card bg-white rounded-lg shadow overflow-hidden">
+                        <div class="p-4 border-b border-gray-200">
+                            <div class="flex justify-between items-start">
+                                <div class="flex items-center">
+                                    <img src="user-avatar.jpg" alt="Supervisor" class="w-12 h-12 rounded-full mr-3">
+                                    <div>
+                                        <h3 class="font-semibold text-lg">Priya Patel</h3>
+                                        <p class="text-gray-600 text-sm">Zone F Supervisor</p>
+                                        <span class="status-badge status-inactive mt-1">Inactive</span>
+                                    </div>
+                                </div>
+                                <div class="dropdown relative">
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <p class="text-sm text-gray-500">Completion Rate</p>
+                                    <p class="font-semibold text-lg">75%</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Team Size</p>
+                                    <p class="font-semibold text-lg">5 Technicians</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Active Tasks</p>
+                                    <p class="font-semibold text-lg">0</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Performance</p>
+                                    <div class="flex items-center">
+                                        <span class="text-lg font-semibold mr-1">3.8</span>
+                                        <div class="text-yellow-400">
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="flex-1 bg-primary text-white py-2 rounded-lg text-sm hover:bg-secondary transition-colors">
+                                    <i class="fas fa-eye mr-1"></i> View Details
+                                </button>
+                                <button class="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg text-sm hover:bg-gray-200 transition-colors">
+                                    <i class="fas fa-message mr-1"></i> Message
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow">
+                    <div class="text-sm text-gray-600">
+                        Showing <span class="font-medium">1-6</span> of <span class="font-medium">8</span> supervisors
+                    </div>
+                    <div class="flex space-x-1">
+                        <button class="px-3 py-1 rounded border border-gray-300 text-gray-500 hover:bg-gray-100 disabled:opacity-50" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="px-3 py-1 rounded border border-gray-300 bg-primary text-white">
+                            1
+                        </button>
+                        <button class="px-3 py-1 rounded border border-gray-300 text-gray-700 hover:bg-gray-100">
+                            2
+                        </button>
+                        <button class="px-3 py-1 rounded border border-gray-300 text-gray-500 hover:bg-gray-100">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar Toggle Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
+            const sidebar = document.querySelector('.sidebar');
+            
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    const icon = sidebarToggle.querySelector('i');
+                    if (sidebar.classList.contains('collapsed')) {
+                        icon.classList.remove('fa-chevron-left');
+                        icon.classList.add('fa-chevron-right');
+                    } else {
+                        icon.classList.remove('fa-chevron-right');
+                        icon.classList.add('fa-chevron-left');
+                    }
+                });
+            }
+            
+            if (mobileSidebarToggle) {
+                mobileSidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                });
+            }
+        });
+
+        // Logout Function
+        function logout() {
+            // Implement logout functionality here
+            window.location.href = 'login.html';
+        }
+        
+        // Theme toggle functionality with localStorage persistence
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else if (theme === 'light') {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                // System preference
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                localStorage.setItem('theme', 'system');
+            }
+        }
+        
+        // Apply saved theme on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'system';
+            setTheme(savedTheme);
+        });
+    </script>
+</body>
+</html>

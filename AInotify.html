@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Notify - MaintainXpert</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#1e40af',
+                        accent: '#3b82f6',
+                        danger: '#ef4444',
+                        warning: '#f59e0b',
+                        success: '#10b981'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        .sidebar.collapsed {
+            width: 80px;
+            overflow: hidden;
+        }
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+        .sidebar.collapsed .logo-text {
+            display: none;
+        }
+        .sidebar.collapsed .user-name {
+            display: none;
+        }
+        .sidebar.collapsed .user-role {
+            display: none;
+        }
+        .sidebar.collapsed .menu-title {
+            display: none;
+        }
+        .main-content {
+            transition: all 0.3s ease;
+            margin-left: 256px;
+        }
+        .sidebar.collapsed ~ .main-content {
+            margin-left: 80px;
+        }
+        @media (max-width: 768px) {
+            .sidebar.collapsed ~ .main-content {
+                margin-left: 0;
+            }
+        }
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                z-index: 1000;
+                height: 100vh;
+            }
+            .sidebar.collapsed {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .temperature-gauge {
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #3b82f6 0%, #f59e0b 50%, #ef4444 100%);
+        }
+        .temperature-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ef4444;
+            position: absolute;
+            top: -2px;
+            transform: translateX(-50%);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-white w-64 border-r border-gray-200 flex flex-col">
+            <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-cogs text-primary text-xl"></i>
+                    <h1 class="text-xl font-bold text-primary ml-2 sidebar-text logo-text">MaintainXpert</h1>
+                </div>
+                <button class="text-gray-500 hover:text-gray-700 sidebar-toggle hidden md:block">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto">
+                <nav class="p-4">
+                    <div class="mb-6">
+                        <p class="text-xs uppercase text-gray-500 font-semibold mb-2 menu-title">Main Menu</p>
+                        <ul>
+                            <li class="mb-1">
+                                <a href="supervisor.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-tachometer-alt mr-3"></i>
+                                    <span class="sidebar-text">Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="machineScanner.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-qrcode mr-3"></i>
+                                    <span class="sidebar-text">Machine Scanner</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="maintenance.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-tools mr-3"></i>
+                                    <span class="sidebar-text">Maintenance</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="Snotifications.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg relative">
+                                    <i class="fas fa-bell mr-3"></i>
+                                    <span class="sidebar-text">Notifications</span>
+                                    <span class="notification-badge">5</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="reports.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-chart-bar mr-3"></i>
+                                    <span class="sidebar-text">Reports</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="PredictiveAlerts.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                                    <span class="sidebar-text">Predictive Alerts</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="SensorSimulation.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-microchip mr-3"></i>
+                                    <span class="sidebar-text">Sensor Simulation</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="OverdueTasks.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-clock mr-3"></i>
+                                    <span class="sidebar-text">Overdue Tasks</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="AInotify.html" class="flex items-center p-2 text-primary bg-blue-50 rounded-lg">
+                                    <i class="fas fa-robot mr-3"></i>
+                                    <span class="sidebar-text">AI Notify</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mb-6">
+                        <p class="text-xs uppercase text-gray-500 font-semibold mb-2 menu-title">Administration</p>
+                        <ul>
+                            <li class="mb-1">
+                                <a href="#users" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-users mr-3"></i>
+                                    <span class="sidebar-text">Users</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="Ssettings.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-cog mr-3"></i>
+                                    <span class="sidebar-text">Settings</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+            <div class="p-4 border-t border-gray-200">
+                <div class="flex items-center justify-between w-full">
+                    <!-- Profile + Name -->
+                    <div class="flex items-center space-x-2">
+                        <img src="sanjay.jpeg" alt="User" class="w-8 h-8 rounded-full">
+                        <div class="leading-tight">
+                            <p class="text-sm font-medium user-name">Sanjay Atmakuri</p>
+                            <p class="text-xs text-gray-500 user-role">Supervisor</p>
+                        </div>
+                    </div>
+                    <!-- Logout Icon -->
+                    <button onclick="logout()" title="Logout" class="sidebar-text">
+                        <i class="fas fa-sign-out-alt text-gray-500 hover:text-red-600 text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content flex-1 flex flex-col overflow-hidden">
+            <!-- Top Navigation -->
+            <header class="bg-white shadow-sm">
+                <div class="px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                    <h1 class="text-2xl font-semibold text-gray-900">AI Notify</h1>
+                    <div class="flex items-center space-x-4">
+                        <button class="md:hidden text-gray-500 hover:text-gray-700 sidebar-toggle">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <div class="relative">
+                            <button class="text-gray-500 hover:text-gray-700">
+                                <!--<i class="fas fa-bell text-xl"></i>
+                                <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>-->
+                            </button>
+                        </div>
+                        <div class="hidden md:flex items-center space-x-2">
+                            <!--<img src="sanjay.jpeg" alt="User" class="w-8 h-8 rounded-full">
+                            <span class="text-sm font-medium">Sanjay Atmakuri</span>-->
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Predictive Alerts Card -->
+                    <div class="feature-card bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="p-6">
+                            <div class="flex items-center mb-4">
+                                <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                    <i class="fas fa-bell text-blue-600 text-xl"></i>
+                                </div>
+                                <h2 class="text-xl font-semibold text-gray-800">Predictive Alerts</h2>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                Automatically sends alerts to technicians via email, SMS, and WhatsApp when potential machine issues are detected.
+                            </p>
+                            <div class="mb-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium text-gray-700">Alerts Sent Today</span>
+                                    <span class="text-sm font-bold text-blue-600">5</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: 75%"></div>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center">
+                                    <i class="fas fa-envelope text-blue-500 mr-2"></i>
+                                    <span class="text-sm text-gray-600">Email: Enabled</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-sms text-green-500 mr-2"></i>
+                                    <span class="text-sm text-gray-600">SMS: Enabled</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fab fa-whatsapp text-green-600 mr-2"></i>
+                                    <span class="text-sm text-gray-600">WhatsApp: Enabled</span>
+                                </div>
+                            </div>
+                            <button onclick="sendTestAlert()" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition duration-200">
+                                Send Test Alert
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sensor Simulation Card -->
+                    <div class="feature-card bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="p-6">
+                            <div class="flex items-center mb-4">
+                                <div class="bg-orange-100 p-3 rounded-full mr-4">
+                                    <i class="fas fa-temperature-high text-orange-600 text-xl"></i>
+                                </div>
+                                <h2 class="text-xl font-semibold text-gray-800">Sensor Simulation</h2>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                Monitors machine temperature in real-time and triggers alerts when exceeding safe thresholds.
+                            </p>
+                            <div class="mb-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium text-gray-700">Current Temperature</span>
+                                    <span class="text-sm font-bold" id="tempValue">68°C</span>
+                                </div>
+                                <div class="temperature-gauge relative">
+                                    <div class="temperature-indicator" id="tempIndicator" style="left: 85%"></div>
+                                </div>
+                                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                    <span>0°C</span>
+                                    <span>35°C</span>
+                                    <span>70°C</span>
+                                    <span>105°C</span>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Simulate Temperature</label>
+                                <input type="range" min="0" max="105" value="68" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" id="tempSlider" oninput="updateTemperature(this.value)">
+                            </div>
+                            <div class="p-3 bg-red-50 rounded-lg mb-4 hidden" id="tempAlert">
+                                <div class="flex items-center">
+                                    <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
+                                    <span class="text-sm text-red-600">Warning: Temperature exceeds safe limit!</span>
+                                </div>
+                            </div>
+                            <button onclick="simulateRandomTemp()" class="mt-2 w-full bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded-lg transition duration-200">
+                                Simulate Random Temperature
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Overdue Tasks Card -->
+                    <div class="feature-card bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="p-6">
+                            <div class="flex items-center mb-4">
+                                <div class="bg-red-100 p-3 rounded-full mr-4">
+                                    <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                                </div>
+                                <h2 class="text-xl font-semibold text-gray-800">Overdue Tasks</h2>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                Tracks and reminds technicians about incomplete maintenance tasks that are past their due date.
+                            </p>
+                            <div class="space-y-3 mb-4">
+                                <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-800">Machine #12 - Bearing Replacement</p>
+                                        <p class="text-xs text-gray-500">Due: 2 days ago</p>
+                                    </div>
+                                    <button class="text-red-600 hover:text-red-800">
+                                        <i class="fas fa-bell"></i>
+                                    </button>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-800">Machine #45 - Lubrication</p>
+                                        <p class="text-xs text-gray-500">Due: Yesterday</p>
+                                    </div>
+                                    <button class="text-red-600 hover:text-red-800">
+                                        <i class="fas fa-bell"></i>
+                                    </button>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-800">Machine #78 - Inspection</p>
+                                        <p class="text-xs text-gray-500">Due: Today</p>
+                                    </div>
+                                    <button class="text-red-600 hover:text-red-800">
+                                        <i class="fas fa-bell"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-600">Total Overdue: 3</span>
+                                <button onclick="remindAllTechnicians()" class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg text-sm transition duration-200">
+                                    Remind All Technicians
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Alerts Section -->
+                <div class="mt-8 bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="p-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Recent Alerts</h2>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Machine</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Issue</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Technician</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">10:23 AM</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">CNC-12</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">High temperature (78°C)</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rajesh Kumar</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <button class="text-blue-600 hover:text-blue-900 mr-3">Resend</button>
+                                            <button class="text-green-600 hover:text-green-900">Mark Fixed</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9:45 AM</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Lathe-05</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Vibration detected</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Amit Sharma</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Fixed</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <button class="text-blue-600 hover:text-blue-900">Details</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">8:30 AM</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Mill-09</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Overdue maintenance</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Sanjay Atmakuri</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Overdue</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <button class="text-blue-600 hover:text-blue-900 mr-3">Resend</button>
+                                            <button class="text-green-600 hover:text-green-900">Mark Fixed</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Technician Selection Modal -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" id="technicianModal">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div class="p-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold">Select Technician</h3>
+            </div>
+            <div class="p-4 max-h-96 overflow-y-auto">
+                <div class="space-y-3" id="technicianList">
+                    <!-- Technicians will be populated here -->
+                </div>
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Custom Message</label>
+                    <textarea id="alertMessage" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Enter alert message..."></textarea>
+                </div>
+            </div>
+            <div class="p-4 border-t border-gray-200 flex justify-end space-x-2">
+                <button onclick="document.getElementById('technicianModal').classList.add('hidden')" class="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100">Cancel</button>
+                <button onclick="sendAlertToSelected()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Send Alert</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample technician data
+        const technicians = [
+            { id: 1, name: "Rajesh Kumar", email: "rajesh@example.com", phone: "+919876543210" },
+            { id: 2, name: "Amit Sharma", email: "amit@example.com", phone: "+919876543211" },
+            { id: 3, name: "Priya Patel", email: "priya@example.com", phone: "+919876543212" },
+            { id: 4, name: "revanth", email: "revanth@example.com", phone: "+919876543213" }
+        ];
+
+        // Initialize technician list
+        function initTechnicianList() {
+            const listElement = document.getElementById('technicianList');
+            technicians.forEach(tech => {
+                const techItem = document.createElement('div');
+                techItem.className = 'flex items-center p-2 hover:bg-gray-50 rounded-lg cursor-pointer';
+                techItem.innerHTML = `
+                    <input type="checkbox" id="tech-${tech.id}" class="form-checkbox text-primary mr-3">
+                    <div>
+                        <p class="font-medium">${tech.name}</p>
+                        <p class="text-sm text-gray-500">${tech.email}</p>
+                        <p class="text-sm text-gray-500">${tech.phone}</p>
+                    </div>
+                `;
+                listElement.appendChild(techItem);
+            });
+        }
+
+        // Sidebar toggle functionality
+        document.querySelectorAll('.sidebar-toggle').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelector('.sidebar').classList.toggle('collapsed');
+                // Change the chevron direction
+                const chevron = button.querySelector('i');
+                if (chevron) {
+                    if (document.querySelector('.sidebar').classList.contains('collapsed')) {
+                        chevron.classList.remove('fa-chevron-left');
+                        chevron.classList.add('fa-chevron-right');
+                    } else {
+                        chevron.classList.remove('fa-chevron-right');
+                        chevron.classList.add('fa-chevron-left');
+                    }
+                }
+            });
+        });
+
+        // Logout function
+        function logout() {
+            alert('Logging out...');
+            // Add actual logout logic here
+        }
+
+        // AI Notify page specific functions
+        function sendTestAlert() {
+            document.getElementById('technicianModal').classList.remove('hidden');
+        }
+
+        // Send alert to selected technicians
+        function sendAlertToSelected() {
+            const message = document.getElementById('alertMessage').value || "Alert: Machine requires immediate attention!";
+            const selectedTechs = [];
+            
+            technicians.forEach(tech => {
+                if (document.getElementById(`tech-${tech.id}`).checked) {
+                    selectedTechs.push(tech);
+                }
+            });
+
+            if (selectedTechs.length === 0) {
+                alert('Please select at least one technician');
+                return;
+            }
+
+            // Simulate sending alerts (in a real app, this would make API calls)
+            selectedTechs.forEach(tech => {
+                console.log(`Sending alert to ${tech.name}:`);
+                console.log(`Email to ${tech.email}: ${message}`);
+                console.log(`SMS to ${tech.phone}: ${message}`);
+                console.log(`WhatsApp to ${tech.phone}: ${message}`);
+            });
+
+            // Show notification for each technician
+            selectedTechs.forEach(tech => {
+                showNotification(`Alert sent to ${tech.name}`, 'success');
+                console.log(`Email sent to ${tech.email}: ${message}`);
+                console.log(`SMS sent to ${tech.phone}: ${message}`);
+                
+                // Add to recent alerts
+                addRecentAlert(
+                    new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                    "Simulated Machine",
+                    message.substring(0, 50) + (message.length > 50 ? "..." : ""),
+                    tech.name,
+                    "Pending"
+                );
+            });
+            
+            document.getElementById('technicianModal').classList.add('hidden');
+            document.getElementById('alertMessage').value = ''; // Clear message
+        }
+
+        function updateTemperature(value) {
+            document.getElementById('tempValue').textContent = value + '°C';
+            const percentage = (value / 105) * 100;
+            document.getElementById('tempIndicator').style.left = `${percentage}%`;
+            
+            // Show warning if temperature exceeds 70°C
+            const tempAlert = document.getElementById('tempAlert');
+            if (value > 70) {
+                tempAlert.classList.remove('hidden');
+                
+                // Auto-notify technicians
+                const alertMessage = `URGENT: Machine temperature is ${value}°C (above safe threshold) - Please check immediately!`;
+                
+                // Get first available technician (in real app would query database)
+                const assignedTech = technicians[0];
+                
+                // Simulate sending notifications
+                showNotification(`Alert sent to ${assignedTech.name}`, 'success');
+                console.log(`Email sent to ${assignedTech.email}: ${alertMessage}`);
+                console.log(`SMS sent to ${assignedTech.phone}: ${alertMessage}`);
+                
+                // Add to recent alerts table
+                addRecentAlert(new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), 
+                              "CNC-12", 
+                              `High temperature (${value}°C)`, 
+                              assignedTech.name, 
+                              "Pending");
+                
+            } else {
+                tempAlert.classList.add('hidden');
+            }
+        }
+
+        function simulateRandomTemp() {
+            // Generate random temperature between 50 and 95
+            const randomTemp = Math.floor(Math.random() * 46) + 50;
+            document.getElementById('tempSlider').value = randomTemp;
+            updateTemperature(randomTemp);
+        }
+
+        function remindAllTechnicians() {
+            alert('Reminders sent to all technicians about overdue tasks!');
+        }
+
+        // Show notification toast
+        function showNotification(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg text-white ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+            }`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Add new alert to recent alerts table
+        function addRecentAlert(time, machine, issue, technician, status) {
+            const tbody = document.querySelector('.bg-white tbody');
+            const newRow = document.createElement('tr');
+            
+            newRow.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${time}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${machine}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${issue}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${technician}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                        status === 'Fixed' ? 'bg-green-100 text-green-800' :
+                        'bg-red-100 text-red-800'
+                    }">${status}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <button class="text-blue-600 hover:text-blue-900 mr-3">Resend</button>
+                    <button class="text-green-600 hover:text-green-900">Mark Fixed</button>
+                </td>
+            `;
+            
+            tbody.insertBefore(newRow, tbody.firstChild);
+        }
+
+        // Initialize temperature display and technician list
+        updateTemperature(68);
+        document.addEventListener('DOMContentLoaded', initTechnicianList);
+        
+        // Theme toggle functionality with localStorage persistence
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else if (theme === 'light') {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                // System preference
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                localStorage.setItem('theme', 'system');
+            }
+        }
+        
+        // Apply saved theme on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'system';
+            setTheme(savedTheme);
+        });
+    </script>
+</body>
+</html>

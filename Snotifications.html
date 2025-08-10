@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MaintainXpert - Notifications</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <style>
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        .sidebar.collapsed {
+            width: 80px;
+            overflow: hidden;
+        }
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+        .sidebar.collapsed .logo-text {
+            display: none;
+        }
+        .sidebar.collapsed .user-name {
+            display: none;
+        }
+        .sidebar.collapsed .user-role {
+            display: none;
+        }
+        .sidebar.collapsed .menu-title {
+            display: none;
+        }
+        .main-content {
+            transition: all 0.3s ease;
+            margin-left: 256px;
+        }
+        .sidebar.collapsed ~ .main-content {
+            margin-left: 80px;
+        }
+        @media (max-width: 768px) {
+            .sidebar.collapsed ~ .main-content {
+                margin-left: 0;
+            }
+        }
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        .machine-status {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-operational {
+            background-color: #10b981;
+        }
+        .status-warning {
+            background-color: #f59e0b;
+        }
+        .status-critical {
+            background-color: #ef4444;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                z-index: 1000;
+                height: 100vh;
+            }
+            .sidebar.collapsed {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+        /* Custom styles for notifications */
+        .notification-item {
+            transition: all 0.2s ease;
+        }
+        .notification-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .notification-unread {
+            border-left: 4px solid #3b82f6;
+            background-color: #f8fafc;
+        }
+        .notification-urgent {
+            border-left: 4px solid #ef4444;
+        }
+        .notification-completed {
+            border-left: 4px solid #10b981;
+        }
+        .notification-pending {
+            border-left: 4px solid #f59e0b;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#1e40af',
+                        accent: '#3b82f6',
+                        danger: '#ef4444',
+                        warning: '#f59e0b',
+                        success: '#10b981'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-white w-64 border-r border-gray-200 flex flex-col">
+            <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-cogs text-primary text-xl"></i>
+                    <h1 class="text-xl font-bold text-primary ml-2 sidebar-text logo-text">MaintainXpert</h1>
+                </div>
+                <button class="text-gray-500 hover:text-gray-700 sidebar-toggle hidden md:block">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto">
+                <nav class="p-4">
+                    <div class="mb-6">
+                        <p class="text-xs uppercase text-gray-500 font-semibold mb-2 menu-title">Main Menu</p>
+                        <ul>
+                            <li class="mb-1">
+                                <a href="supervisor.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-tachometer-alt mr-3"></i>
+                                    <span class="sidebar-text">Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="machineScanner.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-qrcode mr-3"></i>
+                                    <span class="sidebar-text">Machine Scanner</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="maintenance.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-tools mr-3"></i>
+                                    <span class="sidebar-text">Maintenance</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="Snotifications.html" class="flex items-center p-2 text-primary bg-blue-50 rounded-lg relative">
+                                    <i class="fas fa-bell mr-3"></i>
+                                    <span class="sidebar-text">Notifications</span>
+                                    <span class="notification-badge">5</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="reports.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-chart-bar mr-3"></i>
+                                    <span class="sidebar-text">Reports</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="PredictiveAlerts.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                                    <span class="sidebar-text">Predictive Alerts</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="SensorSimulation.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-microchip mr-3"></i>
+                                    <span class="sidebar-text">Sensor Simulation</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="OverdueTasks.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-clock mr-3"></i>
+                                    <span class="sidebar-text">Overdue Tasks</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="AInotify.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-robot mr-3"></i>
+                                    <span class="sidebar-text">AI Notify</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mb-6">
+                        <p class="text-xs uppercase text-gray-500 font-semibold mb-2 menu-title">Administration</p>
+                        <ul>
+                            <li class="mb-1">
+                                <a href="users.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-users mr-3"></i>
+                                    <span class="sidebar-text">Users</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="Ssettings.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    <i class="fas fa-cog mr-3"></i>
+                                    <span class="sidebar-text">Settings</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+            <div class="p-4 border-t border-gray-200">
+                <div class="flex items-center justify-between w-full">
+                    <!-- Profile + Name -->
+                    <div class="flex items-center space-x-2">
+                        <img src="sanjay.jpeg" alt="User" class="w-8 h-8 rounded-full">
+                        <div class="leading-tight">
+                            <p class="text-sm font-medium user-name">Sanjay Atmakuri</p>
+                            <p class="text-xs text-gray-500 user-role">Supervisor</p>
+                        </div>
+                    </div>
+                    <!-- Logout Icon -->
+                    <button onclick="logout()" title="Logout" class="sidebar-text">
+                        <i class="fas fa-sign-out-alt text-gray-500 hover:text-red-600 text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto main-content">
+            <!-- header -->
+            <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+                <button class="text-gray-600 md:hidden" id="mobileSidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h2 class="text-lg font-semibold text-gray-800">Notifications</h2>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <button class="text-gray-600 hover:text-gray-800">
+                            <!--<i class="fas fa-bell"></i>
+                            <span class="notification-badge">5</span>-->
+                        </button>
+                    </div>
+                    <div class="flex items-center">
+                       <!-- <img src="sanjay.jpeg" alt="User" class="w-8 h-8 rounded-full mr-2">
+                        <span class="hidden md:inline">Sanjay Atmakuri</span>-->
+                    </div>
+                </div>
+            </header>
+
+            <!-- Notifications Content -->
+            <main class="p-4">
+                <!-- Notification Filters -->
+                <div class="bg-white p-4 rounded-lg shadow mb-6">
+                    <div class="flex flex-wrap items-center justify-between">
+                        <div class="flex space-x-2 mb-2 md:mb-0">
+                            <button class="px-3 py-1 bg-primary text-white rounded-full text-sm filter-btn" data-filter="all">All</button>
+                            <button class="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-full text-sm filter-btn" data-filter="unread">Unread</button>
+                            <button class="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-full text-sm filter-btn" data-filter="completed">Completed</button>
+                            <button class="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-full text-sm filter-btn" data-filter="pending">Pending</button>
+                            <button class="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-full text-sm filter-btn" data-filter="urgent">Urgent</button>
+                            <!--<button class="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-full text-sm filter-btn" data-filter="urgent-messages">Urgent Messages</button>-->
+                        </div>
+                        <div class="flex items-center">
+                            <div class="relative">
+                                <input type="text" placeholder="Search notifications..." class="pl-8 pr-4 py-1 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            </div>
+                            <div class="relative">
+                                <button class="ml-2 text-gray-500 hover:text-primary filter-icon-btn">
+                                    <i class="fas fa-filter"></i>
+                                </button>
+                                <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden filter-dropdown">
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-filter="all">All Notifications</a>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-filter="unread">Unread Only</a>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-filter="completed">Completed</a>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-filter="pending">Pending</a>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-filter="urgent">Urgent</a>
+                                    <!--<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-filter="urgent-messages">Urgent Messages</a>-->
+                                    <div class="border-t border-gray-200 my-1"></div>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-filter="today">Today</a>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-filter="yesterday">Yesterday</a>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-filter="older">Older</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications List -->
+                <div class="space-y-4">
+                    <!-- Section Title -->
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-gray-800">Today</h3>
+                        <button class="text-sm text-primary hover:underline">Mark all as read</button>
+                    </div>
+
+                    <!-- Notification Items -->
+                    <div class="bg-white rounded-lg shadow notification-item notification-unread">
+                        <div class="p-4 flex items-start">
+                            <div class="flex-shrink-0 pt-1">
+                                <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-primary">
+                                    <i class="fas fa-check-circle text-lg"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="text-sm font-medium text-gray-900">Work Completed</h4>
+                                    <span class="text-xs text-gray-500">10:30 AM</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-1">Technician Rajesh has completed maintenance on CNC Machine #4 (ID: MCNC-004)</p>
+                                <div class="mt-2 flex items-center text-xs text-gray-500">
+                                    <span class="inline-flex items-center">
+                                        <span class="machine-status status-operational"></span>
+                                        Operational
+                                    </span>
+                                    <span class="ml-4">Priority: <span class="font-medium">Medium</span></span>
+                                </div>
+                                <div class="mt-3 flex space-x-2">
+                                    <button class="px-3 py-1 bg-blue-50 text-primary rounded-full text-xs hover:bg-blue-100">View Details</button>
+                                    <button class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs hover:bg-gray-200">Acknowledge</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow notification-item notification-pending">
+                        <div class="p-4 flex items-start">
+                            <div class="flex-shrink-0 pt-1">
+                                <div class="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center text-warning">
+                                    <i class="fas fa-clock text-lg"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="text-sm font-medium text-gray-900">Work Update</h4>
+                                    <span class="text-xs text-gray-500">9:15 AM</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-1">Technician Mohan reports that Hydraulic Press #2 (ID: MHP-002) maintenance will be completed by tomorrow EOD</p>
+                                <div class="mt-2 flex items-center text-xs text-gray-500">
+                                    <span class="inline-flex items-center">
+                                        <span class="machine-status status-warning"></span>
+                                        Maintenance in Progress
+                                    </span>
+                                    <span class="ml-4">Priority: <span class="font-medium">High</span></span>
+                                </div>
+                                <div class="mt-3 flex space-x-2">
+                                    <button class="px-3 py-1 bg-blue-50 text-primary rounded-full text-xs hover:bg-blue-100">View Details</button>
+                                    <button class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs hover:bg-gray-200">Acknowledge</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section Title -->
+                    <div class="flex items-center justify-between mt-6">
+                        <h3 class="text-lg font-semibold text-gray-800">Yesterday</h3>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow notification-item">
+                        <div class="p-4 flex items-start">
+                            <div class="flex-shrink-0 pt-1">
+                                <div class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center text-danger">
+                                    <i class="fas fa-exclamation-triangle text-lg"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="text-sm font-medium text-gray-900">Pending Work</h4>
+                                    <span class="text-xs text-gray-500">4:45 PM</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-1">Manager Kumar has assigned 3 pending maintenance tasks for your review</p>
+                                <div class="mt-2">
+                                    <ul class="text-xs text-gray-600 space-y-1">
+                                        <li class="flex items-center">
+                                            <i class="fas fa-circle text-xs text-warning mr-2"></i>
+                                            Conveyor Belt #3 (ID: MCB-003) - Overdue by 2 days
+                                        </li>
+                                        <li class="flex items-center">
+                                            <i class="fas fa-circle text-xs text-danger mr-2"></i>
+                                            Welding Robot #1 (ID: MWR-001) - Critical issue
+                                        </li>
+                                        <li class="flex items-center">
+                                            <i class="fas fa-circle text-xs text-primary mr-2"></i>
+                                            Packaging Machine #5 (ID: MPM-005) - Scheduled maintenance
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="mt-3 flex space-x-2">
+                                    <button class="px-3 py-1 bg-blue-50 text-primary rounded-full text-xs hover:bg-blue-100">View Tasks</button>
+                                    <button class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs hover:bg-gray-200">Dismiss</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow notification-item notification-completed">
+                        <div class="p-4 flex items-start">
+                            <div class="flex-shrink-0 pt-1">
+                                <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-success">
+                                    <i class="fas fa-check-circle text-lg"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="text-sm font-medium text-gray-900">Work Completed</h4>
+                                    <span class="text-xs text-gray-500">2:20 PM</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-1">Technician Suresh has completed the calibration of Mixing Tank #7 (ID: MMT-007)</p>
+                                <div class="mt-2 flex items-center text-xs text-gray-500">
+                                    <span class="inline-flex items-center">
+                                        <span class="machine-status status-operational"></span>
+                                        Operational
+                                    </span>
+                                    <span class="ml-4">Priority: <span class="font-medium">Low</span></span>
+                                </div>
+                                <div class="mt-3 flex space-x-2">
+                                    <button class="px-3 py-1 bg-blue-50 text-primary rounded-full text-xs hover:bg-blue-100">View Report</button>
+                                    <button class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs hover:bg-gray-200">Dismiss</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section Title -->
+                    <div class="flex items-center justify-between mt-6">
+                        <h3 class="text-lg font-semibold text-gray-800">Urgent</h3>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow notification-item notification-urgent">
+                        <div class="p-4 flex items-start">
+                            <div class="flex-shrink-0 pt-1">
+                                <div class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center text-danger">
+                                    <i class="fas fa-exclamation-triangle text-lg"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="text-sm font-medium text-gray-900">CRITICAL ALERT</h4>
+                                    <span class="text-xs text-gray-500">11:45 AM</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-1">Boiler #3 (ID: MB-003) has exceeded pressure limits! Immediate shutdown required.</p>
+                                <div class="mt-2 flex items-center text-xs text-gray-500">
+                                    <span class="inline-flex items-center">
+                                        <span class="machine-status status-critical"></span>
+                                        Critical Failure
+                                    </span>
+                                    <span class="ml-4">Priority: <span class="font-medium">URGENT</span></span>
+                                </div>
+                                <div class="mt-3 flex space-x-2">
+                                    <button class="px-3 py-1 bg-red-50 text-danger rounded-full text-xs hover:bg-red-100">Emergency Protocol</button>
+                                    <button class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs hover:bg-gray-200">Acknowledge</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow notification-item notification-urgent">
+                        <div class="p-4 flex items-start">
+                            <div class="flex-shrink-0 pt-1">
+                                <div class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center text-danger">
+                                    <i class="fas fa-bolt text-lg"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="text-sm font-medium text-gray-900">POWER OUTAGE</h4>
+                                    <span class="text-xs text-gray-500">10:20 AM</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-1">Section B power failure detected. Backup generators activated but fuel levels low (30%).</p>
+                                <div class="mt-2 flex items-center text-xs text-gray-500">
+                                    <span class="inline-flex items-center">
+                                        <span class="machine-status status-critical"></span>
+                                        System Failure
+                                    </span>
+                                    <span class="ml-4">Priority: <span class="font-medium">URGENT</span></span>
+                                </div>
+                                <div class="mt-3 flex space-x-2">
+                                    <button class="px-3 py-1 bg-red-50 text-danger rounded-full text-xs hover:bg-red-100">View Status</button>
+                                    <button class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs hover:bg-gray-200">Acknowledge</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section Title -->
+                    <div class="flex items-center justify-between mt-6">
+                        <h3 class="text-lg font-semibold text-gray-800">Older Notifications</h3>
+                        <button class="text-sm text-gray-500 hover:text-primary">Clear All</button>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow notification-item">
+                        <div class="p-4 flex items-start">
+                            <div class="flex-shrink-0 pt-1">
+                                <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-primary">
+                                    <i class="fas fa-info-circle text-lg"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="text-sm font-medium text-gray-900">Weekly Summary</h4>
+                                    <span class="text-xs text-gray-500">Monday</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-1">Weekly maintenance report: 12 tasks completed, 3 pending, 1 overdue</p>
+                                <div class="mt-3 flex space-x-2">
+                                    <button class="px-3 py-1 bg-blue-50 text-primary rounded-full text-xs hover:bg-blue-100">View Report</button>
+                                    <button class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs hover:bg-gray-200">Dismiss</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
+            const mainContent = document.querySelector('.main-content');
+
+            // Desktop toggle
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+
+                    // Change the icon based on state
+                    const icon = sidebarToggle.querySelector('i');
+                    if (sidebar.classList.contains('collapsed')) {
+                        icon.classList.remove('fa-chevron-left');
+                        icon.classList.add('fa-chevron-right');
+                    } else {
+                        icon.classList.remove('fa-chevron-right');
+                        icon.classList.add('fa-chevron-left');
+                    }
+                });
+            }
+
+            // Mobile toggle
+            if (mobileSidebarToggle) {
+                mobileSidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    // On mobile, we want to push content when sidebar is open
+                    if (window.innerWidth <= 768) {
+                        if (sidebar.classList.contains('collapsed')) {
+                            mainContent.style.marginLeft = '0';
+                        } else {
+                            mainContent.style.marginLeft = '256px';
+                        }
+                    }
+                });
+            }
+
+            // Function to mark notification as read
+            document.querySelectorAll('.notification-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    this.classList.remove('notification-unread');
+                    this.classList.remove('bg-blue-50');
+                    // In a real app, you would also update the server here
+                });
+            });
+
+            // Notification filtering functionality
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active state from all buttons
+                    document.querySelectorAll('.filter-btn').forEach(b => {
+                        b.classList.remove('bg-primary', 'text-white');
+                        b.classList.add('bg-gray-200', 'hover:bg-gray-300');
+                    });
+                    
+                    // Add active state to clicked button
+                    this.classList.remove('bg-gray-200', 'hover:bg-gray-300');
+                    this.classList.add('bg-primary', 'text-white');
+                    
+                    const filter = this.dataset.filter;
+                    const notifications = document.querySelectorAll('.notification-item');
+                    
+                    notifications.forEach(notification => {
+                        if (filter === 'all') {
+                            notification.style.display = 'block';
+                        } else if (filter === 'unread') {
+                            if (notification.classList.contains('notification-unread')) {
+                                notification.style.display = 'block';
+                            } else {
+                                notification.style.display = 'none';
+                            }
+                        } else {
+                            // For completed/pending/urgent filters
+                            if (notification.classList.contains(`notification-${filter}`)) {
+                                notification.style.display = 'block';
+                            } else {
+                                notification.style.display = 'none';
+                            }
+                        }
+                    });
+                });
+            });
+
+            // Initialize with 'All' filter active
+            document.querySelector('.filter-btn[data-filter="all"]').click();
+
+            // Filter icon dropdown functionality
+            const filterIconBtn = document.querySelector('.filter-icon-btn');
+            const filterDropdown = document.querySelector('.filter-dropdown');
+            
+            if (filterIconBtn && filterDropdown) {
+                filterIconBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    filterDropdown.classList.toggle('hidden');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function() {
+                    filterDropdown.classList.add('hidden');
+                });
+
+                // Handle dropdown filter selections
+                filterDropdown.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const filter = this.dataset.filter;
+                        
+                        // Update the button filter state
+                        document.querySelectorAll('.filter-btn').forEach(btn => {
+                            btn.classList.remove('bg-primary', 'text-white');
+                            btn.classList.add('bg-gray-200', 'hover:bg-gray-300');
+                        });
+                        
+                        // Filter notifications
+                        const notifications = document.querySelectorAll('.notification-item');
+                        const sectionTitles = document.querySelectorAll('main > div > h3');
+                        
+                        notifications.forEach(notification => {
+                            if (filter === 'all') {
+                                notification.style.display = 'block';
+                            } else if (['unread', 'completed', 'pending', 'urgent', 'urgent-messages'].includes(filter)) {
+                                if (notification.classList.contains(`notification-${filter}`)) {
+                                    notification.style.display = 'block';
+                                } else {
+                                    notification.style.display = 'none';
+                                }
+                            } else if (['today', 'yesterday', 'older'].includes(filter)) {
+                                const section = notification.closest('div').previousElementSibling;
+                                if (section && section.tagName === 'H3' && 
+                                    section.textContent.toLowerCase().includes(filter)) {
+                                    notification.style.display = 'block';
+                                } else {
+                                    notification.style.display = 'none';
+                                }
+                            }
+                        });
+
+                        // Hide section titles when filtering by status
+                        if (['unread', 'completed', 'pending', 'urgent'].includes(filter)) {
+                            sectionTitles.forEach(title => {
+                                title.style.display = 'none';
+                            });
+                        } else {
+                            sectionTitles.forEach(title => {
+                                title.style.display = 'flex';
+                            });
+                        }
+
+                        filterDropdown.classList.add('hidden');
+                    });
+                });
+            }
+
+            // Search functionality
+            const searchInput = document.querySelector('input[type="text"]');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    const notifications = document.querySelectorAll('.notification-item');
+                    
+                    notifications.forEach(notification => {
+                        const text = notification.textContent.toLowerCase();
+                        if (text.includes(searchTerm)) {
+                            notification.style.display = 'block';
+                        } else {
+                            notification.style.display = 'none';
+                        }
+                    });
+                });
+            }
+
+            // Logout function
+            window.logout = function() {
+                // In a real app, this would redirect to logout endpoint
+                alert('Logging out...');
+                window.location.href = 'login.html';
+            }
+        });
+        
+        // Theme toggle functionality with localStorage persistence
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else if (theme === 'light') {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                // System preference
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                localStorage.setItem('theme', 'system');
+            }
+        }
+        
+        // Apply saved theme on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'system';
+            setTheme(savedTheme);
+        });
+    </script>
+</body>
+</html>
